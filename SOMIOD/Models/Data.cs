@@ -12,14 +12,15 @@ namespace SOMIOD.Models
         public String Content { get; set; }
         public DateTime CreationDate { get; set; }
         public Application Parent { get; set; }
-        
+
         public Data(int id, String content, DateTime creationDate, Application parent)
-    {
         {
-            Id = id;
-            Content = content;
-            CreationDate = creationDate;
-            Parent = parent;
+            {
+                Id = id;
+                Content = content;
+                CreationDate = creationDate;
+                Parent = parent;
+            }
         }
     }
 }
