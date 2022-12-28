@@ -13,15 +13,14 @@ namespace SOMIOD.Controllers
 {
     public class SomiodController : ApiController
     {
-
         // POST: api/Somiod
         public HttpResponseMessage Post([FromBody] string name)
         {
-            try{
+            try {
                 DbHelper.CreateApplication(name);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application created");
             }
-            catch(Exception e){
+            catch (Exception e) {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
@@ -29,10 +28,11 @@ namespace SOMIOD.Controllers
         // GET: api/Somiod
         public HttpResponseMessage GetApplications()
         {
-            try{
+            try {
                 var apps = DbHelper.GetApplications();
                 return Request.CreateResponse(HttpStatusCode.OK, apps);
-            }catch (Exception e){
+            }
+            catch (Exception e) {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
@@ -40,14 +40,13 @@ namespace SOMIOD.Controllers
         // GET: api/Somiod/application
         public HttpResponseMessage GetApplication(string application)
         {
-            try
-            {
+            try {
                 var app = DbHelper.GetApplication(application);
                 return Request.CreateResponse(HttpStatusCode.OK, app);
             }
-            catch (Exception e)
-            {
-                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError, e.Message);
+            catch (Exception e) {
+                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
+                                                   e.Message);
             }
         }
 
@@ -59,14 +58,13 @@ namespace SOMIOD.Controllers
         // DELETE: api/Somiod/application
         public HttpResponseMessage Delete(string application)
         {
-            try
-            {
+            try {
                 DbHelper.DeleteApplication(application);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application was deleted");
             }
-            catch (Exception e)
-            {
-                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError, e.Message);
+            catch (Exception e) {
+                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
+                                                   e.Message);
             }
         }
     }
