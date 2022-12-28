@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Xml.Linq;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
 using SOMIOD.Properties;
@@ -9,16 +10,6 @@ namespace SOMIOD.Helper
 {
     public static class DbHelper
     {
-        //private static void HasChildren(Application app)
-        //{
-        //    using (var db = new SomiodContext())
-        //    {
-        //        if (db.Modules.Any(m => m.Parent.Id == app.Id))
-        //        {
-        //            throw new Exception("Application has children");
-        //        }
-        //    }
-        //}
         public static List<Application> GetApplications()
         {
             var applications = new List<Application>();
@@ -86,7 +77,19 @@ namespace SOMIOD.Helper
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                var cmd = new SqlCommand("DELETE FROM Application WHERE Name=@Name", db);
+
+                var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", name);
+                var reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    throw new Exception("Cannot delete an application with modules");
+                }
+
+                reader.Close();
+
+                cmd = new SqlCommand("DELETE FROM Application WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 int rowChng = cmd.ExecuteNonQuery();
 
