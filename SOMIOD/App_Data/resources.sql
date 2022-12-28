@@ -1,12 +1,12 @@
 ﻿CREATE TABLE [dbo].[Application] (
-    [Id]           INT          NOT NULL,
+    [Id]           INT          IDENTITY(1,1) NOT NULL,
     [Name]         VARCHAR (50) NOT NULL UNIQUE,
     [CreationDate] DATETIME     NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
 CREATE TABLE [dbo].[Module] (
-    [Id]           INT          NOT NULL,
+    [Id]           INT          IDENTITY(1,1) NOT NULL,
     [Name]         VARCHAR (50) NOT NULL UNIQUE,
     [CreationDate] DATETIME     NOT NULL,
     [Parent]       INT          NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[Module] (
 );
 
 CREATE TABLE [dbo].[Subscription] (
-    [Id]           INT          NOT NULL,
+    [Id]           INT          IDENTITY(1,1) NOT NULL,
     [Name]         VARCHAR (50) NOT NULL UNIQUE,
     [CreationDate] DATETIME     NOT NULL,
     [Parent]       INT          NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE [dbo].[Subscription] (
 );
 
 CREATE TABLE [dbo].[Data] (
-    [Id]           INT          NOT NULL,
+    [Id]           INT          IDENTITY(1,1) NOT NULL,
     [Content]      VARCHAR (50) NOT NULL,
     [CreationDate] DATETIME     NOT NULL,
     [Parent]       INT          NOT NULL,
