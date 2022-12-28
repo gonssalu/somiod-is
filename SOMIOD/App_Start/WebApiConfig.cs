@@ -15,9 +15,9 @@ namespace SOMIOD
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                name: "SomiodApi",
+                routeTemplate: "api/somiod/{application}/{module}/{resource}",
+                defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
             );
         }
     }
