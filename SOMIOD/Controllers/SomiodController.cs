@@ -52,6 +52,7 @@ namespace SOMIOD.Controllers
         //// PUT: api/Somiod/application
         public HttpResponseMessage PutApplication(string application, [FromBody] string newName)
         {
+            Console.WriteLine(newName);
             try {
                 DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");

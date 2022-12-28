@@ -75,6 +75,10 @@ namespace SOMIOD.Helper
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@NewName", newName);
+
+                Console.WriteLine(cmd.Parameters[0]);
+                Console.WriteLine(cmd.Parameters[1]);
+                Console.WriteLine(newName);
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
