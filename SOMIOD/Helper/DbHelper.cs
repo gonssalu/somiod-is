@@ -10,6 +10,17 @@ namespace SOMIOD.Helper
 {
     public class DbHelper
     {
+
+        //private static void HasChildren(Application app)
+        //{
+        //    using (var db = new SomiodContext())
+        //    {
+        //        if (db.Modules.Any(m => m.Parent.Id == app.Id))
+        //        {
+        //            throw new Exception("Application has children");
+        //        }
+        //    }
+        //}
         public static List<Application> GetApplications()
         {
             var applications = new List<Application>();
