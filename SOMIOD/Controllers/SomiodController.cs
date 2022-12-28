@@ -50,14 +50,15 @@ namespace SOMIOD.Controllers
         // {
         // }
         //// PUT: api/Somiod/application
-        public HttpResponseMessage Put(string application)
+        public HttpResponseMessage PutApplication(string application, [FromBody] string newName)
         {
             try {
-                DbHelper.UpdateApplication(application);
+                DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
             }
             catch (Exception e) {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
+                                                   e.Message);
             }
         }
 

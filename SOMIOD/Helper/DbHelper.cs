@@ -68,13 +68,13 @@ namespace SOMIOD.Helper
             }
         }
 
-        public static void UpdateApplication(string name)
+        public static void UpdateApplication(string name, string newName)
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                var cmd = new SqlCommand("UPDATE Application SET Name=@Name WHERE Name=@OldName", db);
+                var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
-                cmd.Parameters.AddWithValue("@OldName", name);
+                cmd.Parameters.AddWithValue("@NewName", newName);
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
