@@ -19,6 +19,10 @@ namespace SOMIOD
                 routeTemplate: "api/somiod/{application}/{module}/{resource}",
                 defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
             );
+
+            //Disable json
+            var formatters = GlobalConfiguration.Configuration.Formatters;
+            formatters.Remove(formatters.JsonFormatter);
         }
     }
 }
