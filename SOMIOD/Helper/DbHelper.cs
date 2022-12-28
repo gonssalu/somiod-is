@@ -78,7 +78,7 @@ namespace SOMIOD.Helper
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
-                    throw new Exception("An unknown error as occurred");
+                    throw new ModelNotFoundException("Application");
             }
         }
 
