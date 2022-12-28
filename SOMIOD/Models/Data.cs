@@ -11,9 +11,9 @@ namespace SOMIOD.Models
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreationDate { get; set; }
-        public Application Parent { get; set; }
+        public Module Parent { get; set; }
 
-        public Data(int id, string content, DateTime creationDate, Application parent)
+        public Data(int id, string content, DateTime creationDate, Module parent)
         {
             {
                 Id = id;
