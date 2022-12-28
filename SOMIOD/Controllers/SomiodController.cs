@@ -21,32 +21,34 @@ namespace SOMIOD.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, "Application created");
             }
             catch(Exception e){
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
         // GET: api/Somiod
-        public HttpResponseMessage Get()
+        public HttpResponseMessage GetApplications()
         {
             try{
                 var apps = DbHelper.GetApplications();
                 return Request.CreateResponse(HttpStatusCode.OK, apps);
             }catch (Exception e){
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
         // GET: api/Somiod/application
-        public HttpResponseMessage Get(string name)
+        public HttpResponseMessage GetApplication(string application)
         {
             try
             {
-                var app = DbHelper.GetApplication(name);
+                var app = DbHelper.GetApplication(application);
+                if (app == null)
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Application not found");
                 return Request.CreateResponse(HttpStatusCode.OK, app);
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 

@@ -31,8 +31,8 @@ namespace SOMIOD.Helper
             using (var dbcon = new DbConnection())
             {
                 var db = dbcon.Open();
-                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@name", db);
-                cmd.Parameters.AddWithValue("Name", name);
+                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", name);
                 var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
@@ -40,7 +40,7 @@ namespace SOMIOD.Helper
                 }
                 else
                 {
-                    throw new Exception("Application not found");
+                    return null;
                 }
             }
         }
@@ -50,9 +50,9 @@ namespace SOMIOD.Helper
             using (var dbcon = new DbConnection())
             {
                 var db = dbcon.Open();
-                var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@name, @creationDate)", db);
-                cmd.Parameters.AddWithValue("@name", name);
-                cmd.Parameters.AddWithValue("@creationDate", DateTime.Now);
+                var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 cmd.ExecuteNonQuery();
             }
         }
