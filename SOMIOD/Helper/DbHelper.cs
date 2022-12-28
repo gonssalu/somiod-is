@@ -1,16 +1,14 @@
-﻿using SOMIOD.Exceptions;
-using SOMIOD.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
+using SOMIOD.Exceptions;
+using SOMIOD.Models;
+using SOMIOD.Properties;
 
 namespace SOMIOD.Helper
 {
-    public class DbHelper
+    public static class DbHelper
     {
-
         //private static void HasChildren(Application app)
         //{
         //    using (var db = new SomiodContext())
@@ -25,8 +23,8 @@ namespace SOMIOD.Helper
         {
             var applications = new List<Application>();
 
-            using (var dbcon = new DbConnection()) {
-                var db = dbcon.Open();
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Application", db);
                 var reader = cmd.ExecuteReader();
 
@@ -42,8 +40,8 @@ namespace SOMIOD.Helper
         {
             var applications = new List<Application>();
 
-            using (var dbcon = new DbConnection()) {
-                var db = dbcon.Open();
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 var reader = cmd.ExecuteReader();
@@ -58,25 +56,39 @@ namespace SOMIOD.Helper
 
         public static void CreateApplication(string name)
         {
-            using (var dbcon = new DbConnection()) {
-                var db = dbcon.Open();
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
                 var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
-                var rowChng = cmd.ExecuteNonQuery();
+                int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
-                    throw new Exception("An unkown error as occurred");
+                    throw new Exception("An unknown error as occurred");
+            }
+        }
+
+        public static void UpdateApplication(string name)
+        {
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+                var cmd = new SqlCommand("UPDATE Application SET Name=@Name WHERE Name=@OldName", db);
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@OldName", name);
+                int rowChng = cmd.ExecuteNonQuery();
+
+                if (rowChng != 1)
+                    throw new Exception("An unknown error as occurred");
             }
         }
 
         public static void DeleteApplication(string name)
         {
-            using (var dbcon = new DbConnection()) {
-                var db = dbcon.Open();
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
                 var cmd = new SqlCommand("DELETE FROM Application WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
-                var rowChng = cmd.ExecuteNonQuery();
+                int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
                     throw new ModelNotFoundException("Application");
@@ -85,24 +97,23 @@ namespace SOMIOD.Helper
 
         private class DbConnection : IDisposable
         {
-            private string _connStr = Properties.Settings.Default.connStr;
-
-            private SqlConnection conn = null;
+            private readonly string _connStr = Settings.Default.connStr;
+            private readonly SqlConnection _conn;
 
             public DbConnection()
             {
-                conn = new SqlConnection(_connStr);
+                _conn = new SqlConnection(_connStr);
             }
 
             public SqlConnection Open()
             {
-                conn.Open();
-                return conn;
+                _conn.Open();
+                return _conn;
             }
 
             public void Dispose()
             {
-                conn.Close();
+                _conn.Close();
             }
         }
     }

@@ -1,13 +1,9 @@
-﻿using SOMIOD.Exceptions;
-using SOMIOD.Helper;
-using SOMIOD.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Description;
+using SOMIOD.Exceptions;
+using SOMIOD.Helper;
 
 namespace SOMIOD.Controllers
 {
@@ -50,10 +46,20 @@ namespace SOMIOD.Controllers
             }
         }
 
+        // public void Put(int id, [FromBody] string value)
+        // {
+        // }
         //// PUT: api/Somiod/application
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
+        public HttpResponseMessage Put(string application)
+        {
+            try {
+                DbHelper.UpdateApplication(application);
+                return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
+            }
+            catch (Exception e) {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 
         // DELETE: api/Somiod/application
         public HttpResponseMessage Delete(string application)
