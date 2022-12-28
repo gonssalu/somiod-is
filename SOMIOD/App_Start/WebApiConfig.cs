@@ -21,8 +21,8 @@ namespace SOMIOD
             );
 
             //Disable json
-            var formatters = GlobalConfiguration.Configuration.Formatters;
-            formatters.Remove(formatters.JsonFormatter);
+            //var formatters = GlobalConfiguration.Configuration.Formatters;
+            //formatters.Remove(formatters.JsonFormatter);
         }
     }
 }
