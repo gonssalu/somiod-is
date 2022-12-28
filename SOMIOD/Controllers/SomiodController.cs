@@ -1,4 +1,5 @@
-﻿using SOMIOD.Helper;
+﻿using SOMIOD.Exceptions;
+using SOMIOD.Helper;
 using SOMIOD.Models;
 using System;
 using System.Collections.Generic;
@@ -42,24 +43,31 @@ namespace SOMIOD.Controllers
             try
             {
                 var app = DbHelper.GetApplication(application);
-                if (app == null)
-                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Application not found");
                 return Request.CreateResponse(HttpStatusCode.OK, app);
             }
             catch (Exception e)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
-        //// PUT: api/Somiod/5
+        //// PUT: api/Somiod/application
         //public void Put(int id, [FromBody] string value)
         //{
         //}
 
-        //// DELETE: api/Somiod/5
-        //public void Delete(int id)
-        //{
-        //}
+        // DELETE: api/Somiod/application
+        public HttpResponseMessage Delete(string application)
+        {
+            try
+            {
+                DbHelper.DeleteApplication(application);
+                return Request.CreateResponse(HttpStatusCode.OK, "Application was deleted");
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }

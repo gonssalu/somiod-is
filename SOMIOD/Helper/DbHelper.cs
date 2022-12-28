@@ -1,4 +1,5 @@
-﻿using SOMIOD.Models;
+﻿using SOMIOD.Exceptions;
+using SOMIOD.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -40,7 +41,7 @@ namespace SOMIOD.Helper
                 }
                 else
                 {
-                    return null;
+                    throw new ModelNotFoundException("Application");
                 }
             }
         }
@@ -53,7 +54,22 @@ namespace SOMIOD.Helper
                 var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
-                cmd.ExecuteNonQuery();
+                var rowChng = cmd.ExecuteNonQuery();
+                if (rowChng != 1)
+                    throw new Exception("An unkown error as occurred");
+            }
+        }
+
+        public static void DeleteApplication(string name)
+        {
+            using (var dbcon = new DbConnection())
+            {
+                var db = dbcon.Open();
+                var cmd = new SqlCommand("DELETE FROM Application WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", name);
+                var rowChng = cmd.ExecuteNonQuery();
+                if (rowChng != 1)
+                    throw new ModelNotFoundException("Application");
             }
         }
 
