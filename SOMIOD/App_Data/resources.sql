@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Resources] (
     [Id]           INT          NOT NULL,
-    [Name]         VARCHAR (50) NOT NULL UNIQUE,
+    [Name]         VARCHAR (50) NULL,
     [Content]      VARCHAR (50) NULL,
     [CreationDate] DATETIME     NOT NULL,
     [Parent]       INT          NULL,
