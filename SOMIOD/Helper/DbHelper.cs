@@ -24,6 +24,27 @@ namespace SOMIOD.Helper
             }
             return applications;
         }
+
+        public static Application GetApplication(string name)
+        {
+            var applications = new List<Application>();
+            using (var dbcon = new DbConnection())
+            {
+                var db = dbcon.Open();
+                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@name", db);
+                cmd.Parameters.AddWithValue("Name", name);
+                var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new Application(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2));
+                }
+                else
+                {
+                    throw new Exception("Application not found");
+                }
+            }
+        }
+
         public static void CreateApplication(string name)
         {
             using (var dbcon = new DbConnection())
