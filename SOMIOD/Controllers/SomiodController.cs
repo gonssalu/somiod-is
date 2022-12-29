@@ -16,8 +16,7 @@ namespace SOMIOD.Controllers
         {
             try {
                 var applications = DbHelper.GetApplications();
-                var xmlDoc = RequestHelper.Serialize(applications);
-                return RequestHelper.CreateMessage(Request, xmlDoc);
+                return RequestHelper.CreateMessage(Request, applications);
             }
             catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);

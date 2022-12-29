@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SOMIOD.Helpers
 {
@@ -25,22 +26,13 @@ namespace SOMIOD.Helpers
         }
 
 
-        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, Application app)
+        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, Object obj)
         {
-            return request.CreateResponse(HttpStatusCode.OK, app, "application/xml");
-        }
-
-        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, string str)
-        {
-            return request.CreateResponse(HttpStatusCode.OK, str, "application/xml");
-        }
-
-        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, XmlDocument xmlDoc)
-        {
+            var xmlDoc = Serialize(obj);
             return request.CreateResponse(HttpStatusCode.OK, xmlDoc, "application/xml");
         }
 
-        public static XmlDocument Serialize(object obj)
+        private static XmlDocument Serialize(object obj)
         {
             var xmlDoc = new XmlDocument();
             var serializer = new XmlSerializer(obj.GetType());
