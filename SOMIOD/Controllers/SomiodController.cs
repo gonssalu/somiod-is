@@ -76,5 +76,19 @@ namespace SOMIOD.Controllers
                 return RequestHelper.CreateError(Request, e);
             }
         }
+
+        // DELETE: api/Somiod/application/module
+        public HttpResponseMessage Delete(string application, string module)
+        {
+            try
+            {
+                DbHelper.DeleteModule(application, module);
+                return Request.CreateResponse(HttpStatusCode.OK, "Module was deleted");
+            }
+            catch (Exception e)
+            {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
     }
 }
