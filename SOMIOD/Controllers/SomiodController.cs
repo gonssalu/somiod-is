@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using SOMIOD.Helpers;
+using SOMIOD.Models;
 
 namespace SOMIOD.Controllers
 {
@@ -38,10 +39,13 @@ namespace SOMIOD.Controllers
 
         // POST: api/Somiod
         [Route("api/Somiod")]
-        public HttpResponseMessage Post([FromBody] string name)
+        public HttpResponseMessage Post(HttpRequestMessage request)
         {
             try {
-                DbHelper.CreateApplication(name);
+                string xml = request.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(xml);
+                // DbHelper.CreateApplication(name);
+                return null;
                 return RequestHelper.CreateMessage(Request, "Application created");
             }
             catch (Exception e) {
@@ -53,11 +57,12 @@ namespace SOMIOD.Controllers
         // {
         // }
         //// PUT: api/Somiod/application
-        [Route("api/Somiod/{application}")]
-        public HttpResponseMessage Put(string application, [FromBody] string newName)
+        [Route("api/Somiod/{oldName}")]
+        public HttpResponseMessage Put(string oldName, [FromBody] Application application)
         {
             try {
-                DbHelper.UpdateApplication(application, newName);
+                string newName = application.Name;
+                DbHelper.UpdateApplication(oldName, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
             }
             catch (Exception e) {
