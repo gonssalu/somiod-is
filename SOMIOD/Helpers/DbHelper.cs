@@ -9,7 +9,7 @@ using SOMIOD.Properties;
 namespace SOMIOD.Helpers
 {
     public static class DbHelper
-    {
+    {   
         public static List<Application> GetApplications()
         {
             var applications = new List<Application>();
@@ -49,7 +49,18 @@ namespace SOMIOD.Helpers
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
+
+                //Check if app with that name exists
+                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", name);
+                var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    throw new UnprocessableEntityException("An application with that name already exists");
+                }
+                reader.Close();
+                
+                cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 int rowChng = cmd.ExecuteNonQuery();
