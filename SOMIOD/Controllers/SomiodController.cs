@@ -3,12 +3,13 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using SOMIOD.Exceptions;
-using SOMIOD.Helper;
+using SOMIOD.Helpers;
 
 namespace SOMIOD.Controllers
 {
     public class SomiodController : ApiController
     {
+
         // POST: api/Somiod
         public HttpResponseMessage Post([FromBody] string name)
         {
@@ -17,7 +18,7 @@ namespace SOMIOD.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, "Application created");
             }
             catch (Exception e) {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+                return RequestHelper.GenerateError(Request, e);
             }
         }
 
@@ -28,8 +29,9 @@ namespace SOMIOD.Controllers
                 var apps = DbHelper.GetApplications();
                 return Request.CreateResponse(HttpStatusCode.OK, apps);
             }
-            catch (Exception e) {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+            catch (Exception e)
+            {
+                return RequestHelper.GenerateError(Request, e);
             }
         }
 
@@ -40,9 +42,9 @@ namespace SOMIOD.Controllers
                 var app = DbHelper.GetApplication(application);
                 return Request.CreateResponse(HttpStatusCode.OK, app);
             }
-            catch (Exception e) {
-                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
-                                                   e.Message);
+            catch (Exception e)
+            {
+                return RequestHelper.GenerateError(Request, e);
             }
         }
 
@@ -56,9 +58,9 @@ namespace SOMIOD.Controllers
                 DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
             }
-            catch (Exception e) {
-                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
-                                                   e.Message);
+            catch (Exception e)
+            {
+                return RequestHelper.GenerateError(Request, e);
             }
         }
 
@@ -69,9 +71,9 @@ namespace SOMIOD.Controllers
                 DbHelper.DeleteApplication(application);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application was deleted");
             }
-            catch (Exception e) {
-                return Request.CreateErrorResponse(e is ModelNotFoundException ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError,
-                                                   e.Message);
+            catch (Exception e)
+            {
+                return RequestHelper.GenerateError(Request, e);
             }
         }
     }

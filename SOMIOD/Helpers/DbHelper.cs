@@ -6,7 +6,7 @@ using SOMIOD.Exceptions;
 using SOMIOD.Models;
 using SOMIOD.Properties;
 
-namespace SOMIOD.Helper
+namespace SOMIOD.Helpers
 {
     public static class DbHelper
     {
