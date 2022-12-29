@@ -26,7 +26,7 @@ namespace SOMIOD.Helpers
         }
 
 
-        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, Object obj)
+        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, object obj)
         {
             var xmlDoc = Serialize(obj);
             return request.CreateResponse(HttpStatusCode.OK, xmlDoc, "application/xml");
