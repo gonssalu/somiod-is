@@ -48,9 +48,6 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // public void Put(int id, [FromBody] string value)
-        // {
-        // }
         //// PUT: api/Somiod/application
         public HttpResponseMessage PutApplication(string application, [FromBody] string newName)
         {
