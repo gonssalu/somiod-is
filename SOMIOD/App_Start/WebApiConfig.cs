@@ -15,14 +15,17 @@ namespace SOMIOD
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
-                name: "SomiodApi",
-                routeTemplate: "api/somiod/{application}/{module}/{resource}",
-                defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
-            );
+                                       name: "SomiodApi",
+                                       routeTemplate: "api/somiod/{application}/{module}/{resource}",
+                                       defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
+                                      );
 
             //Disable json
             //var formatters = GlobalConfiguration.Configuration.Formatters;
             //formatters.Remove(formatters.JsonFormatter);
+            
+            var xml = GlobalConfiguration.Configuration.Formatters.XmlFormatter;
+            xml.UseXmlSerializer = true;
         }
     }
 }
