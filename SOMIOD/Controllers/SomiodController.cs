@@ -15,10 +15,10 @@ namespace SOMIOD.Controllers
         {
             try {
                 DbHelper.CreateApplication(name);
-                return Request.CreateResponse(HttpStatusCode.OK, "Application created");
+                return RequestHelper.CreateMessage(Request, "Application created");
             }
             catch (Exception e) {
-                return RequestHelper.GenerateError(Request, e);
+                return RequestHelper.CreateError(Request, e);
             }
         }
 
@@ -27,11 +27,11 @@ namespace SOMIOD.Controllers
         {
             try {
                 var apps = DbHelper.GetApplications();
-                return Request.CreateResponse(HttpStatusCode.OK, apps);
+                return RequestHelper.CreateMessage(Request, apps);
             }
             catch (Exception e)
             {
-                return RequestHelper.GenerateError(Request, e);
+                return RequestHelper.CreateError(Request, e);
             }
         }
 
@@ -44,7 +44,7 @@ namespace SOMIOD.Controllers
             }
             catch (Exception e)
             {
-                return RequestHelper.GenerateError(Request, e);
+                return RequestHelper.CreateError(Request, e);
             }
         }
 
@@ -60,7 +60,7 @@ namespace SOMIOD.Controllers
             }
             catch (Exception e)
             {
-                return RequestHelper.GenerateError(Request, e);
+                return RequestHelper.CreateError(Request, e);
             }
         }
 
@@ -73,7 +73,7 @@ namespace SOMIOD.Controllers
             }
             catch (Exception e)
             {
-                return RequestHelper.GenerateError(Request, e);
+                return RequestHelper.CreateError(Request, e);
             }
         }
     }
