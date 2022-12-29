@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 
 namespace SOMIOD
 {
@@ -18,12 +15,12 @@ namespace SOMIOD
                 name: "SomiodApi",
                 routeTemplate: "api/somiod/{application}/{module}/{resource}",
                 defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
-            );
+                );
 
             //Disable json
             //var formatters = GlobalConfiguration.Configuration.Formatters;
             //formatters.Remove(formatters.JsonFormatter);
-            
+
             var xml = GlobalConfiguration.Configuration.Formatters.XmlFormatter;
             xml.UseXmlSerializer = true;
         }
