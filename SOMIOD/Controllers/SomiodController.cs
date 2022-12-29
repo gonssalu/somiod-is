@@ -18,30 +18,26 @@ namespace SOMIOD.Controllers
 
         // GET: api/Somiod
         [Route("api/Somiod")]
-        public FormattedContentResult<XmlDocument> GetApplications()
+        public HttpResponseMessage GetApplications()
         {
             try {
                 var applications = DbHelper.GetApplications();
 
-                var xmlDoc = new XmlDocument();
-                var serializer = new XmlSerializer(applications.GetType());
+                var xmlDoc = RequestHelper.Serialize(applications);
 
-                using (var ms = new MemoryStream()) {
-                    serializer.Serialize(ms, applications);
-                    ms.Position = 0;
-                    xmlDoc.Load(ms);
-                    // return Request.CreateResponse(HttpStatusCode.OK, xmlDoc.InnerXml);
-                    return Content(HttpStatusCode.OK, xmlDoc, Configuration.Formatters.XmlFormatter);
-                }
+                var xml = Configuration.Formatters.XmlFormatter;
+                xml.UseXmlSerializer = true;
+
+                return Request.CreateResponse(HttpStatusCode.OK, xmlDoc);
             }
             catch (Exception e) {
-                // return RequestHelper.CreateError(Request, e);
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message));
+                return RequestHelper.CreateError(Request, e);
+                // throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message));
             }
         }
 
         // GET: api/Somiod/application
-        [Route("api/Somiod/application/{id}")]
+        [Route("api/Somiod/application/{application}")]
         public HttpResponseMessage GetApplication(string application)
         {
             try {
