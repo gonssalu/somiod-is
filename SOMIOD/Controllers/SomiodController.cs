@@ -16,12 +16,7 @@ namespace SOMIOD.Controllers
         {
             try {
                 var applications = DbHelper.GetApplications();
-
                 var xmlDoc = RequestHelper.Serialize(applications);
-
-                var xml = Configuration.Formatters.XmlFormatter;
-                xml.UseXmlSerializer = true;
-
                 return RequestHelper.CreateMessage(Request, xmlDoc);
             }
             catch (Exception e) {
@@ -30,7 +25,7 @@ namespace SOMIOD.Controllers
         }
 
         // GET: api/Somiod/application
-        [Route("api/Somiod/application/{application}")]
+        [Route("api/Somiod/{application}")]
         public HttpResponseMessage GetApplication(string application)
         {
             try {
@@ -43,7 +38,7 @@ namespace SOMIOD.Controllers
         }
 
         // POST: api/Somiod
-        [Route("api/Somiod/application")]
+        [Route("api/Somiod")]
         public HttpResponseMessage Post([FromBody] string name)
         {
             try {
