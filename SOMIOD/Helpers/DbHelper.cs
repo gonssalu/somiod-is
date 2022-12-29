@@ -9,7 +9,22 @@ using SOMIOD.Properties;
 namespace SOMIOD.Helpers
 {
     public static class DbHelper
-    {   
+    {
+        #region Generic Methods
+        private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
+        {
+            var cmd = new SqlCommand("SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName", db);
+            cmd.Parameters.AddWithValue("@ParentName", parentName);
+            cmd.Parameters.AddWithValue("@ChildName", childName);
+            var reader = cmd.ExecuteReader();
+            if (!reader.Read())
+                throw new ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'", false);
+
+            reader.Close();
+        }
+        #endregion
+
+        #region Application
         public static List<Application> GetApplications()
         {
             var applications = new List<Application>();
@@ -108,7 +123,51 @@ namespace SOMIOD.Helpers
                     throw new ModelNotFoundException("Application");
             }
         }
+        #endregion Application
 
+        #region Module
+        private static void IsModuleParentValid(SqlConnection db, string appName, string moduleName)
+        {
+            IsParentValid(db, "Application", appName, "Module", moduleName);
+        }
+
+        public static void DeleteModule(string appName, string moduleName)
+        {
+            using (var dbConn = new DbConnection())
+            {
+                var db = dbConn.Open();
+
+                IsModuleParentValid(db, appName, moduleName);
+
+                //Check if module has any data / subscription children
+                var cmd = new SqlCommand("SELECT * FROM Module m JOIN Subscription s ON (m.Id = s.Parent) JOIN Data d ON (m.Id = d.Parent) WHERE m.Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", moduleName);
+                var reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    throw new Exception("Cannot delete a module with data or subscriptions");
+                }
+
+                reader.Close();
+
+                cmd = new SqlCommand("DELETE FROM Module WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", moduleName);
+                int rowChng = cmd.ExecuteNonQuery();
+
+                if (rowChng != 1)
+                    throw new ModelNotFoundException("Module");
+            }
+        }
+        #endregion Module
+
+        #region Subscription
+
+        #endregion Subscription
+
+        #region Data
+
+        #endregion Data
         private class DbConnection : IDisposable
         {
             private readonly string _connStr = Settings.Default.connStr;

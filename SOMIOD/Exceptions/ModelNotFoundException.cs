@@ -7,7 +7,7 @@ namespace SOMIOD.Exceptions
         public ModelNotFoundException() : base("Resource not found")
         {
         }
-        public ModelNotFoundException(string message) : base(message + " not found")
+        public ModelNotFoundException(string message, bool suffix=true) : base(message + (suffix?" not found":""))
         {
         }
     }
