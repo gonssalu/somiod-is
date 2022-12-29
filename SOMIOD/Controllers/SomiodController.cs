@@ -18,7 +18,7 @@ namespace SOMIOD.Controllers
 
         // GET: api/Somiod
         [Route("api/Somiod")]
-        public FormattedContentResult<string> GetApplications()
+        public FormattedContentResult<XmlDocument> GetApplications()
         {
             try {
                 var applications = DbHelper.GetApplications();
@@ -31,7 +31,7 @@ namespace SOMIOD.Controllers
                     ms.Position = 0;
                     xmlDoc.Load(ms);
                     // return Request.CreateResponse(HttpStatusCode.OK, xmlDoc.InnerXml);
-                    return Content(HttpStatusCode.OK, xmlDoc.InnerXml, Configuration.Formatters.XmlFormatter);
+                    return Content(HttpStatusCode.OK, xmlDoc, Configuration.Formatters.XmlFormatter);
                 }
             }
             catch (Exception e) {
