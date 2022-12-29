@@ -1,10 +1,11 @@
-﻿using SOMIOD.Exceptions;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
+using SOMIOD.Exceptions;
+using SOMIOD.Models;
 
 namespace SOMIOD.Helpers
 {
@@ -23,11 +24,22 @@ namespace SOMIOD.Helpers
             return request.CreateErrorResponse(httpStatusCode, exception.Message);
         }
 
-        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, object obj)
+
+        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, Application app)
         {
-            return request.CreateResponse(HttpStatusCode.OK, obj, "application/xml");
+            return request.CreateResponse(HttpStatusCode.OK, app, "application/xml");
         }
-        
+
+        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, string str)
+        {
+            return request.CreateResponse(HttpStatusCode.OK, str, "application/xml");
+        }
+
+        public static HttpResponseMessage CreateMessage(HttpRequestMessage request, XmlDocument xmlDoc)
+        {
+            return request.CreateResponse(HttpStatusCode.OK, xmlDoc, "application/xml");
+        }
+
         public static XmlDocument Serialize(object obj)
         {
             var xmlDoc = new XmlDocument();

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Results;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 using SOMIOD.Helpers;
 
 namespace SOMIOD.Controllers
@@ -28,11 +22,10 @@ namespace SOMIOD.Controllers
                 var xml = Configuration.Formatters.XmlFormatter;
                 xml.UseXmlSerializer = true;
 
-                return Request.CreateResponse(HttpStatusCode.OK, xmlDoc);
+                return RequestHelper.CreateMessage(Request, xmlDoc);
             }
             catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
-                // throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message));
             }
         }
 
@@ -42,7 +35,7 @@ namespace SOMIOD.Controllers
         {
             try {
                 var app = DbHelper.GetApplication(application);
-                return Request.CreateResponse(HttpStatusCode.OK, app);
+                return RequestHelper.CreateMessage(Request, app);
             }
             catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
