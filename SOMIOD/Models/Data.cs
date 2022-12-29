@@ -7,9 +7,9 @@ namespace SOMIOD.Models
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreationDate { get; set; }
-        public Module Parent { get; set; }
+        public int Parent { get; set; }
 
-        public Data(int id, string content, DateTime creationDate, Module parent)
+        public Data(int id, string content, DateTime creationDate, int parent)
         {
             {
                 Id = id;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 
 namespace SOMIOD
 {
@@ -14,12 +11,11 @@ namespace SOMIOD
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            config.Routes.MapHttpRoute
-            (
+            config.Routes.MapHttpRoute(
                 name: "SomiodApi",
                 routeTemplate: "api/somiod/{application}/{module}/{resource}",
                 defaults: new { controller = "somiod", application = RouteParameter.Optional, module = RouteParameter.Optional, resource = RouteParameter.Optional }
-            );
+                );
 
             //Disable json
             //var formatters = GlobalConfiguration.Configuration.Formatters;
