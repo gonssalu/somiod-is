@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using SOMIOD.Exceptions;
 using SOMIOD.Helpers;
 using SOMIOD.Models;
 
@@ -39,13 +40,15 @@ namespace SOMIOD.Controllers
 
         // POST: api/Somiod
         [Route("api/Somiod")]
-        public HttpResponseMessage Post(HttpRequestMessage request)
+        public HttpResponseMessage Post([FromBody] Application newApp)
         {
-            try {
-                string xml = request.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(xml);
-                // DbHelper.CreateApplication(name);
-                return null;
+            try
+            {
+                if (newApp == null)
+                    throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
+                if (newApp.Name == null || newApp.Name == "")
+                    throw new UnprocessableEntityException("You must include the name of your new application");
+                DbHelper.CreateApplication(newApp.Name);
                 return RequestHelper.CreateMessage(Request, "Application created");
             }
             catch (Exception e) {
@@ -57,12 +60,17 @@ namespace SOMIOD.Controllers
         // {
         // }
         //// PUT: api/Somiod/application
-        [Route("api/Somiod/{oldName}")]
-        public HttpResponseMessage Put(string oldName, [FromBody] Application application)
+        [Route("api/Somiod/{application}")]
+        public HttpResponseMessage Put(string application, [FromBody] Application newAppDetails)
         {
-            try {
-                string newName = application.Name;
-                DbHelper.UpdateApplication(oldName, newName);
+            try
+            {
+                if (newAppDetails == null)
+                    throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
+                if (newAppDetails.Name == null || newAppDetails.Name == "")
+                    throw new UnprocessableEntityException("You must include the updated name of the application");
+                string newName = newAppDetails.Name;
+                DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
             }
             catch (Exception e) {
