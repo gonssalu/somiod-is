@@ -89,11 +89,11 @@ namespace SOMIOD.Controllers
 
         #region Module
 
-        [Route("api/somiod/{appName}/modules")]
-        public HttpResponseMessage GetModules(string appName)
+        [Route("api/somiod/{application}/modules")]
+        public HttpResponseMessage GetModules(string application)
         {
             try {
-                var modules = DbHelper.GetModules(appName);
+                var modules = DbHelper.GetModules(application);
                 return RequestHelper.CreateMessage(Request, modules);
             }
             catch (Exception e) {
@@ -101,12 +101,12 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{appName}/modules/{moduleName}")]
-        public HttpResponseMessage GetModule(string appName, string moduleName)
+        [Route("api/somiod/{application}/modules/{module}")]
+        public HttpResponseMessage GetModule(string application, string module)
         {
             try {
-                var module = DbHelper.GetModule(appName, moduleName);
-                return RequestHelper.CreateMessage(Request, module);
+                var mod = DbHelper.GetModule(application, module);
+                return RequestHelper.CreateMessage(Request, mod);
             }
             catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
@@ -132,8 +132,8 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{appName}/modules/{moduleName}")]
-        public HttpResponseMessage Put(string appName, string moduleName, [FromBody] Module newModuleDetails)
+        [Route("api/somiod/{application}/modules/{module}")]
+        public HttpResponseMessage Put(string application, string module, [FromBody] Module newModuleDetails)
         {
             try {
                 if (newModuleDetails == null)
@@ -143,7 +143,7 @@ namespace SOMIOD.Controllers
                     throw new UnprocessableEntityException("You must include the updated name of the module");
 
                 string newName = newModuleDetails.Name;
-                DbHelper.UpdateModule(appName, moduleName, newName);
+                DbHelper.UpdateModule(application, module, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Module updated");
             }
             catch (Exception e) {
@@ -163,6 +163,9 @@ namespace SOMIOD.Controllers
             }
         }
 
+        #endregion
+
+        #region Data
         #endregion
     }
 }
