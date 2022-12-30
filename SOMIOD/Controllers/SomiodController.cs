@@ -55,10 +55,7 @@ namespace SOMIOD.Controllers
                 return RequestHelper.CreateError(Request, e);
             }
         }
-
-        // public void Put(int id, [FromBody] string value)
-        // {
-        // }
+        
         //// PUT: api/Somiod/application
         [Route("api/Somiod/{application}")]
         public HttpResponseMessage Put(string application, [FromBody] Application newAppDetails)
