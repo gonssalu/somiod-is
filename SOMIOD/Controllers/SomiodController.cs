@@ -101,7 +101,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{application}/modules/{module}")]
+        [Route("api/somiod/{application}/{module}")]
         public HttpResponseMessage GetModule(string application, string module)
         {
             try {
