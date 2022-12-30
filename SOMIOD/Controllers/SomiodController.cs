@@ -186,8 +186,8 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{application}/{module}/{data}")]
-        public HttpResponseMessage Delete(string application, string module, int dataId)
+        [Route("api/somiod/{application}/{module}/{dataId}")]
+        public HttpResponseMessage DeleteData(string application, string module, int dataId)
         {
             try
             {
