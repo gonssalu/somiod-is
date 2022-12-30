@@ -5,8 +5,6 @@ using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
 using SOMIOD.Exceptions;
-using SOMIOD.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SOMIOD.Helpers
 {
