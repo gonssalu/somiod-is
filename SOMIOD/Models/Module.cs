@@ -9,6 +9,8 @@ namespace SOMIOD.Models
         [XmlElement(ElementName = "Parent")]
         public int Parent { get; set; }
 
+        public Module() { }
+
         public Module(int id, string name, DateTime creationDate, int parent) : base(id, name, creationDate)
         {
             Parent = parent;

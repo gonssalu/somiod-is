@@ -42,12 +42,13 @@ namespace SOMIOD.Controllers
         [Route("api/Somiod")]
         public HttpResponseMessage Post([FromBody] Application newApp)
         {
-            try
-            {
+            try {
                 if (newApp == null)
                     throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
-                if (newApp.Name == null || newApp.Name == "")
+
+                if (string.IsNullOrEmpty(newApp.Name))
                     throw new UnprocessableEntityException("You must include the name of your new application");
+
                 DbHelper.CreateApplication(newApp.Name);
                 return RequestHelper.CreateMessage(Request, "Application created");
             }
@@ -55,17 +56,18 @@ namespace SOMIOD.Controllers
                 return RequestHelper.CreateError(Request, e);
             }
         }
-        
+
         //// PUT: api/Somiod/application
         [Route("api/Somiod/{application}")]
         public HttpResponseMessage Put(string application, [FromBody] Application newAppDetails)
         {
-            try
-            {
+            try {
                 if (newAppDetails == null)
                     throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
+
                 if (newAppDetails.Name == null || newAppDetails.Name == "")
                     throw new UnprocessableEntityException("You must include the updated name of the application");
+
                 string newName = newAppDetails.Name;
                 DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
@@ -91,22 +93,35 @@ namespace SOMIOD.Controllers
         #endregion
 
         #region Module
-        
+
+        [Route("api/Somiod/{appName}/modules")]
+        public HttpResponseMessage GetModules(string appName)
+        {
+            try {
+                var modules = DbHelper.GetModules(appName);
+                return RequestHelper.CreateMessage(Request, modules);
+            }
+            catch (Exception e) {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
         // POST: api/Somiod
         [Route("api/Somiod/{application}")]
         public HttpResponseMessage Post(string application, [FromBody] Module newModule)
         {
-            try
-            {
+            // return null;
+            try {
                 if (newModule == null)
                     throw new UnprocessableEntityException("You must provide a module with a name in the correct xml format");
-                if (newModule.Name == null || newModule.Name == "")
+
+                if (string.IsNullOrEmpty(newModule.Name))
                     throw new UnprocessableEntityException("You must include the name of your new module");
+
                 DbHelper.CreateModule(application, newModule.Name);
                 return RequestHelper.CreateMessage(Request, "Module created");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
             }
         }

@@ -11,14 +11,16 @@ namespace SOMIOD.Helpers
     public static class DbHelper
     {
         #region Generic Methods
+
         //Verifica se existe uma child com o nome fornecido no parent com o nome fornecido, e se o parent existe em si
         //Este método deve ser utilizado em Deletes / Updates, ou seja em situações em que a child já existe.
         private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
                 new
-                    SqlCommand("SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
-                               db);
+                    SqlCommand(
+                    "SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
+                    db);
             cmd.Parameters.AddWithValue("@ParentName", parentName);
             cmd.Parameters.AddWithValue("@ChildName", childName);
             var reader = cmd.ExecuteReader();
@@ -27,6 +29,7 @@ namespace SOMIOD.Helpers
                 throw new
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
+
             reader.Close();
         }
 
@@ -41,6 +44,7 @@ namespace SOMIOD.Helpers
 
             if (!reader.Read())
                 throw new ModelNotFoundException("Couldn't find " + parentType.ToLower() + " '" + parentName + "'", false);
+
             var parentId = reader.GetInt32(0);
             reader.Close();
             return parentId;
@@ -87,8 +91,7 @@ namespace SOMIOD.Helpers
 
         private static void ProcessSqlExceptionApplication(SqlException e)
         {
-            switch (e.Number)
-            {
+            switch (e.Number) {
                 //Cannot insert duplicate key in object
                 case 2627:
                     throw new UnprocessableEntityException("An application with that name already exists");
@@ -105,14 +108,14 @@ namespace SOMIOD.Helpers
                 var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
-                try
-                {
+
+                try {
                     int rowChng = cmd.ExecuteNonQuery();
+
                     if (rowChng != 1)
                         throw new UntreatedSqlException();
                 }
-                catch (SqlException e)
-                {
+                catch (SqlException e) {
                     ProcessSqlExceptionApplication(e);
                 }
             }
@@ -122,24 +125,23 @@ namespace SOMIOD.Helpers
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                
+
                 //Check if app with that name exists
                 //CheckAppNameIsFree(db, newName);
 
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@NewName", newName);
-                try
-                {
+
+                try {
                     int rowChng = cmd.ExecuteNonQuery();
+
                     if (rowChng != 1)
                         throw new ModelNotFoundException("Application");
                 }
-                catch(SqlException e)
-                {
+                catch (SqlException e) {
                     ProcessSqlExceptionApplication(e);
                 }
-
             }
         }
 
@@ -170,7 +172,7 @@ namespace SOMIOD.Helpers
         #endregion Application
 
         #region Module
-        
+
         private static void IsModuleParentValid(SqlConnection db, string appName, string moduleName)
         {
             IsParentValid(db, "Application", appName, "Module", moduleName);
@@ -178,8 +180,7 @@ namespace SOMIOD.Helpers
 
         private static void ProcessSqlExceptionModule(SqlException e)
         {
-            switch (e.Number)
-            {
+            switch (e.Number) {
                 //Cannot insert duplicate key in object
                 case 2627:
                     throw new UnprocessableEntityException("A module with that name already exists");
@@ -188,27 +189,45 @@ namespace SOMIOD.Helpers
             }
         }
 
+        public static List<Module> GetModules(string appName)
+        {
+            var modules = new List<Module>();
+
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+                var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@AppName", db);
+                cmd.Parameters.AddWithValue("@AppName", appName);
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read()) {
+                    modules.Add(new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
+                }
+            }
+
+            return modules;
+        }
+
         public static void CreateModule(string appName, string moduleName)
         {
-            using (var dbConn = new DbConnection())
-            {
+            using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                
-                var parentId = GetParentId(db, "Application", appName);
+
+                int parentId = GetParentId(db, "Application", appName);
+
+                Console.WriteLine("ParentId: " + parentId);
 
                 var cmd = new SqlCommand("INSERT INTO Module (Name, CreationDate, Parent) VALUES (@Name, @CreationDate, @Parent)", db);
                 cmd.Parameters.AddWithValue("@Name", moduleName);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@Parent", parentId);
-                
-                try
-                {
+
+                try {
                     int rowChng = cmd.ExecuteNonQuery();
+
                     if (rowChng != 1)
                         throw new UntreatedSqlException();
                 }
-                catch (SqlException e)
-                {
+                catch (SqlException e) {
                     ProcessSqlExceptionModule(e);
                 }
             }
