@@ -114,9 +114,8 @@ namespace SOMIOD.Controllers
         }
 
         [Route("api/somiod/{application}")]
-        public HttpResponseMessage Post(string application, [FromBody] Module newModule)
+        public HttpResponseMessage PostModule(string application, [FromBody] Module newModule)
         {
-            // return null;
             try {
                 if (newModule == null)
                     throw new UnprocessableEntityException("You must provide a module with a name in the correct xml format");
@@ -132,8 +131,8 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{application}/modules/{module}")]
-        public HttpResponseMessage Put(string application, string module, [FromBody] Module newModuleDetails)
+        [Route("api/somiod/{application}/{module}")]
+        public HttpResponseMessage PutModule(string application, string module, [FromBody] Module newModuleDetails)
         {
             try {
                 if (newModuleDetails == null)
@@ -152,7 +151,7 @@ namespace SOMIOD.Controllers
         }
 
         [Route("api/somiod/{application}/{module}")]
-        public HttpResponseMessage Delete(string application, string module)
+        public HttpResponseMessage DeleteModule(string application, string module)
         {
             try {
                 DbHelper.DeleteModule(application, module);
@@ -166,6 +165,41 @@ namespace SOMIOD.Controllers
         #endregion
 
         #region Data
+
+        [Route("api/somiod/{application}/{module}")]
+        public HttpResponseMessage PostData(string application, string module, [FromBody] Data newData)
+        {
+            try
+            {
+                if (newData == null)
+                    throw new UnprocessableEntityException("You must provide a data resource with a valid content in the correct xml format");
+
+                if (string.IsNullOrEmpty(newData.Content))
+                    throw new UnprocessableEntityException("You must include a content for that data resource");
+
+                DbHelper.CreateData(application, module, newData.Content);
+                return RequestHelper.CreateMessage(Request, "Data resource created");
+            }
+            catch (Exception e)
+            {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
+        [Route("api/somiod/{application}/{module}/{data}")]
+        public HttpResponseMessage Delete(string application, string module, int dataId)
+        {
+            try
+            {
+                DbHelper.DeleteData(application, module, dataId);
+                return Request.CreateResponse(HttpStatusCode.OK, "Data resource was deleted");
+            }
+            catch (Exception e)
+            {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
         #endregion
     }
 }

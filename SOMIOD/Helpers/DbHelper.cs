@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Web.UI;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
 using SOMIOD.Properties;
@@ -230,8 +231,6 @@ namespace SOMIOD.Helpers
 
                 int parentId = GetParentId(db, "Application", appName);
 
-                Console.WriteLine("ParentId: " + parentId);
-
                 var cmd = new SqlCommand("INSERT INTO Module (Name, CreationDate, Parent) VALUES (@Name, @CreationDate, @Parent)", db);
                 cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
@@ -298,7 +297,7 @@ namespace SOMIOD.Helpers
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
-                    throw new ModelNotFoundException("Module");
+                    throw new UntreatedSqlException();
             }
         }
 
@@ -309,7 +308,70 @@ namespace SOMIOD.Helpers
         #endregion Subscription
 
         #region Data
+        
+        public static void CreateData(string appName, string moduleName, string dataContent)
+        {
+            using (var dbConn = new DbConnection())
+            {
+                var db = dbConn.Open();
 
+                IsModuleParentValid(db, appName, moduleName);
+
+                int parentId = GetParentId(db, "Module", moduleName);
+
+                var cmd = new SqlCommand("INSERT INTO Data (Content, CreationDate, Parent) VALUES (@Content, @CreationDate, @Parent)", db);
+                cmd.Parameters.AddWithValue("@Content", dataContent);
+                cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@Parent", parentId);
+
+                try
+                {
+                    int rowChng = cmd.ExecuteNonQuery();
+
+                    if (rowChng != 1)
+                        throw new UntreatedSqlException();
+
+                    //TODO: Notify Create Subscriptions
+                }
+                catch (SqlException e)
+                {
+                    ProcessSqlExceptionModule(e);
+                }
+            }
+        }
+        public static void DeleteData(string appName, string moduleName, int dataId)
+        {
+            using (var dbConn = new DbConnection())
+            {
+                var db = dbConn.Open();
+
+                IsModuleParentValid(db, appName, moduleName);
+
+                var cmd =
+                new
+                    SqlCommand(
+                    "SELECT * FROM Module m JOIN Data d ON (d.Parent = m.Id) WHERE d.Id=@DataId AND m.Name=@ModuleName",
+                    db);
+                cmd.Parameters.AddWithValue("@DataId", dataId);
+                cmd.Parameters.AddWithValue("@ModuleName", moduleName.ToLower());
+                var reader = cmd.ExecuteReader();
+
+                if (!reader.Read())
+                    throw new
+                        ModelNotFoundException("A data resource with the Id #" + dataId + " does not exist in the module " + moduleName, false);
+
+                reader.Close();
+
+                cmd = new SqlCommand("DELETE FROM Data WHERE Id=@Id", db);
+                cmd.Parameters.AddWithValue("@Id", dataId);
+                int rowChng = cmd.ExecuteNonQuery();
+
+                if (rowChng != 1)
+                    throw new UntreatedSqlException();
+
+                //TODO: Notify Delete Subscriptions
+            }
+        }
         #endregion Data
 
         private class DbConnection : IDisposable
