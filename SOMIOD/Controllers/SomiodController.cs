@@ -12,8 +12,7 @@ namespace SOMIOD.Controllers
     {
         #region Application
 
-        // GET: api/Somiod
-        [Route("api/Somiod")]
+        [Route("api/somiod")]
         public HttpResponseMessage GetApplications()
         {
             try {
@@ -25,8 +24,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // GET: api/Somiod/application
-        [Route("api/Somiod/{application}")]
+        [Route("api/somiod/{application}")]
         public HttpResponseMessage GetApplication(string application)
         {
             try {
@@ -38,8 +36,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // POST: api/Somiod
-        [Route("api/Somiod")]
+        [Route("api/somiod")]
         public HttpResponseMessage Post([FromBody] Application newApp)
         {
             try {
@@ -57,8 +54,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        //// PUT: api/Somiod/application
-        [Route("api/Somiod/{application}")]
+        [Route("api/somiod/{application}")]
         public HttpResponseMessage Put(string application, [FromBody] Application newAppDetails)
         {
             try {
@@ -77,8 +73,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // DELETE: api/Somiod/application
-        [Route("api/Somiod/{application}")]
+        [Route("api/somiod/{application}")]
         public HttpResponseMessage Delete(string application)
         {
             try {
@@ -94,7 +89,7 @@ namespace SOMIOD.Controllers
 
         #region Module
 
-        [Route("api/Somiod/{appName}/modules")]
+        [Route("api/somiod/{appName}/modules")]
         public HttpResponseMessage GetModules(string appName)
         {
             try {
@@ -106,7 +101,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/Somiod/{appName}/modules/{moduleName}")]
+        [Route("api/somiod/{appName}/modules/{moduleName}")]
         public HttpResponseMessage GetModule(string appName, string moduleName)
         {
             try {
@@ -118,7 +113,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/Somiod/{application}")]
+        [Route("api/somiod/{application}")]
         public HttpResponseMessage Post(string application, [FromBody] Module newModule)
         {
             // return null;
@@ -137,7 +132,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/Somiod/{appName}/modules/{moduleName}")]
+        [Route("api/somiod/{appName}/modules/{moduleName}")]
         public HttpResponseMessage Put(string appName, string moduleName, [FromBody] Module newModuleDetails)
         {
             try {
@@ -156,7 +151,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/Somiod/{application}/{module}")]
+        [Route("api/somiod/{application}/{module}")]
         public HttpResponseMessage Delete(string application, string module)
         {
             try {
