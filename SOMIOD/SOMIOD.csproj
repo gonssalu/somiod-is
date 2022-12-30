@@ -168,7 +168,6 @@
     <Compile Include="Exceptions\UntreatedSqlException.cs" />
     <Compile Include="Exceptions\UnprocessableEntityException.cs" />
     <Compile Include="Exceptions\ModelNotFoundException.cs" />
-    <Compile Include="Exceptions\UntreatedSqlException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
