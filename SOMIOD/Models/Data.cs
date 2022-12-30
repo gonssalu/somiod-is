@@ -18,6 +18,8 @@ namespace SOMIOD.Models
         [XmlElement(ElementName = "Parent")]
         public int Parent { get; set; }
 
+        public Data() { }
+
         public Data(int id, string content, DateTime creationDate, int parent)
         {
             {
