@@ -9,7 +9,8 @@ namespace SOMIOD.Models
     [XmlRoot(ElementName = "Module")]
     public class ModuleWithData : Module
     {
-        [XmlElement(ElementName = "Data")]
+        [XmlArray("DataResources")]
+        [XmlArrayItem(Type=typeof(Data), ElementName = "Data")]
         public List<Data> Data { get; set; }
 
         public ModuleWithData() { }
