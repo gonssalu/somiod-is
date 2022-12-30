@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Web.Security;
 using System.Web.UI;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
@@ -14,12 +15,13 @@ namespace SOMIOD.Helpers
 
         //Verifica se existe uma child com o nome fornecido no parent com o nome fornecido, e se o parent existe em si
         //Este método deve ser utilizado em Deletes / Updates, ou seja em situações em que a child já existe.
-        private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
+        //Retorna o id da child
+        private static int IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
                 new
                     SqlCommand(
-                    "SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
+                    "SELECT c.Id FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
                     db);
             cmd.Parameters.AddWithValue("@ParentName", parentName.ToLower());
             cmd.Parameters.AddWithValue("@ChildName", childName.ToLower());
@@ -29,8 +31,9 @@ namespace SOMIOD.Helpers
                 throw new
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
-
+            var childId = reader.GetInt32(0);
             reader.Close();
+            return childId;
         }
 
         //Procura o parent, e se existir retorna o seu id.
@@ -66,6 +69,7 @@ namespace SOMIOD.Helpers
                 while (reader.Read()) {
                     applications.Add(new Application(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2)));
                 }
+                reader.Close();
             }
 
             return applications;
@@ -173,9 +177,9 @@ namespace SOMIOD.Helpers
 
         #region Module
 
-        private static void IsModuleParentValid(SqlConnection db, string appName, string moduleName)
+        private static int IsModuleParentValid(SqlConnection db, string appName, string moduleName)
         {
-            IsParentValid(db, "Application", appName, "Module", moduleName);
+            return IsParentValid(db, "Application", appName, "Module", moduleName);
         }
 
         private static void ProcessSqlExceptionModule(SqlException e)
@@ -202,24 +206,30 @@ namespace SOMIOD.Helpers
                 while (reader.Read()) {
                     modules.Add(new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
                 }
+                reader.Close();
             }
 
             return modules;
         }
 
-        public static Module GetModule(string appName, string moduleName)
+        public static ModuleWithData GetModule(string appName, string moduleName)
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@AppName AND m.Name=@ModuleName", db);
-                cmd.Parameters.AddWithValue("@AppName", appName.ToLower());
-                cmd.Parameters.AddWithValue("@ModuleName", moduleName.ToLower());
+
+                var moduleId = IsModuleParentValid(db, appName, moduleName);
+
+                var cmd = new SqlCommand("SELECT * FROM Module WHERE Id=@Id", db);
+                cmd.Parameters.AddWithValue("@Id", moduleId);
                 var reader = cmd.ExecuteReader();
 
+                List<Data> data = GetDataResourcesForModule(moduleId);
+
                 if (reader.Read()) {
-                    return new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3));
+                    return new ModuleWithData(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3), data);
+                    
                 } else {
-                    throw new ModelNotFoundException("Module");
+                    throw new UntreatedSqlException();
                 }
             }
         }
@@ -308,7 +318,29 @@ namespace SOMIOD.Helpers
         #endregion Subscription
 
         #region Data
-        
+
+        public static List<Data> GetDataResourcesForModule(int parentId)
+        {
+            var dataRes = new List<Data>();
+
+            using (var dbConn = new DbConnection())
+            {
+                var db = dbConn.Open();
+                
+                var cmd = new SqlCommand("SELECT * FROM Data WHERE Parent=@Parent", db);
+                cmd.Parameters.AddWithValue("@Parent", parentId);
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    dataRes.Add(new Data(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
+                }
+                reader.Close();
+            }
+
+            return dataRes;
+        }
+
         public static void CreateData(string appName, string moduleName, string dataContent)
         {
             using (var dbConn = new DbConnection())
