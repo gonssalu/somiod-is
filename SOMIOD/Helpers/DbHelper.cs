@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Xml.Linq;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
 using SOMIOD.Properties;
@@ -21,8 +20,8 @@ namespace SOMIOD.Helpers
                     SqlCommand(
                     "SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
                     db);
-            cmd.Parameters.AddWithValue("@ParentName", parentName);
-            cmd.Parameters.AddWithValue("@ChildName", childName);
+            cmd.Parameters.AddWithValue("@ParentName", parentName.ToLower());
+            cmd.Parameters.AddWithValue("@ChildName", childName.ToLower());
             var reader = cmd.ExecuteReader();
 
             if (!reader.Read())
@@ -39,7 +38,7 @@ namespace SOMIOD.Helpers
         private static int GetParentId(SqlConnection db, string parentType, string parentName)
         {
             var cmd = new SqlCommand("SELECT Id FROM " + parentType + " WHERE Name=@ParentName", db);
-            cmd.Parameters.AddWithValue("@ParentName", parentName);
+            cmd.Parameters.AddWithValue("@ParentName", parentName.ToLower());
             var reader = cmd.ExecuteReader();
 
             if (!reader.Read())
@@ -78,7 +77,7 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 var reader = cmd.ExecuteReader();
 
                 if (reader.Read()) {
@@ -106,7 +105,7 @@ namespace SOMIOD.Helpers
                 var db = dbConn.Open();
 
                 var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
-                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
 
                 try {
@@ -130,8 +129,8 @@ namespace SOMIOD.Helpers
                 //CheckAppNameIsFree(db, newName);
 
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
-                cmd.Parameters.AddWithValue("@NewName", newName);
+                cmd.Parameters.AddWithValue("@Name", name.ToLower());
+                cmd.Parameters.AddWithValue("@NewName", newName.ToLower());
 
                 try {
                     int rowChng = cmd.ExecuteNonQuery();
@@ -151,7 +150,7 @@ namespace SOMIOD.Helpers
                 var db = dbConn.Open();
 
                 var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 var reader = cmd.ExecuteReader();
 
                 if (reader.Read()) {
@@ -161,7 +160,7 @@ namespace SOMIOD.Helpers
                 reader.Close();
 
                 cmd = new SqlCommand("DELETE FROM Application WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
@@ -196,7 +195,7 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@AppName", db);
-                cmd.Parameters.AddWithValue("@AppName", appName);
+                cmd.Parameters.AddWithValue("@AppName", appName.ToLower());
                 var reader = cmd.ExecuteReader();
 
                 while (reader.Read()) {
@@ -212,8 +211,8 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@AppName AND m.Name=@ModuleName", db);
-                cmd.Parameters.AddWithValue("@AppName", appName);
-                cmd.Parameters.AddWithValue("@ModuleName", moduleName);
+                cmd.Parameters.AddWithValue("@AppName", appName.ToLower());
+                cmd.Parameters.AddWithValue("@ModuleName", moduleName.ToLower());
                 var reader = cmd.ExecuteReader();
 
                 if (reader.Read()) {
@@ -234,7 +233,7 @@ namespace SOMIOD.Helpers
                 Console.WriteLine("ParentId: " + parentId);
 
                 var cmd = new SqlCommand("INSERT INTO Module (Name, CreationDate, Parent) VALUES (@Name, @CreationDate, @Parent)", db);
-                cmd.Parameters.AddWithValue("@Name", moduleName);
+                cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@Parent", parentId);
 
@@ -258,8 +257,8 @@ namespace SOMIOD.Helpers
                 IsModuleParentValid(db, appName, moduleName);
 
                 var cmd = new SqlCommand("UPDATE Module SET Name=@NewName WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", moduleName);
-                cmd.Parameters.AddWithValue("@NewName", newModuleName);
+                cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
+                cmd.Parameters.AddWithValue("@NewName", newModuleName.ToLower());
 
                 try {
                     int rowChng = cmd.ExecuteNonQuery();
@@ -285,7 +284,7 @@ namespace SOMIOD.Helpers
                     new
                         SqlCommand("SELECT * FROM Module m JOIN Subscription s ON (m.Id = s.Parent) JOIN Data d ON (m.Id = d.Parent) WHERE m.Name=@Name",
                                    db);
-                cmd.Parameters.AddWithValue("@Name", moduleName);
+                cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 var reader = cmd.ExecuteReader();
 
                 if (reader.Read()) {
@@ -295,7 +294,7 @@ namespace SOMIOD.Helpers
                 reader.Close();
 
                 cmd = new SqlCommand("DELETE FROM Module WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", moduleName);
+                cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
