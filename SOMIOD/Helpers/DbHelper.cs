@@ -69,23 +69,29 @@ namespace SOMIOD.Helpers
             }
         }
 
+        private static void CheckAppNameIsFree(SqlConnection sql, string name)
+        {
+            var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", sql);
+            cmd.Parameters.AddWithValue("@Name", name);
+            var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                throw new UnprocessableEntityException("An application with that name already exists");
+            }
+
+            reader.Close();
+        }
+
         public static void CreateApplication(string name)
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
                 //Check if app with that name exists
-                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
-                var reader = cmd.ExecuteReader();
+                CheckAppNameIsFree(db, name);
 
-                if (reader.Read()) {
-                    throw new UnprocessableEntityException("An application with that name already exists");
-                }
-
-                reader.Close();
-
-                cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
+                var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 int rowChng = cmd.ExecuteNonQuery();
@@ -99,6 +105,10 @@ namespace SOMIOD.Helpers
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
+                
+                //Check if app with that name exists
+                //CheckAppNameIsFree(db, newName);
+
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@NewName", newName);
