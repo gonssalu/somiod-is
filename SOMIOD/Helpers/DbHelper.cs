@@ -11,11 +11,13 @@ namespace SOMIOD.Helpers
     public static class DbHelper
     {
         #region Generic Methods
-        private static int IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
+        //Verifica se existe uma child com o nome fornecido no parent com o nome fornecido, e se o parent existe em si
+        //Este método deve ser utilizado em Deletes / Updates, ou seja em situações em que a child já existe.
+        private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
                 new
-                    SqlCommand("SELECT p.Id, c.Id FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
+                    SqlCommand("SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
                                db);
             cmd.Parameters.AddWithValue("@ParentName", parentName);
             cmd.Parameters.AddWithValue("@ChildName", childName);
@@ -25,10 +27,12 @@ namespace SOMIOD.Helpers
                 throw new
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
-            var parentId = reader.GetInt32(0);
             reader.Close();
-            return parentId;
         }
+
+        //Procura o parent, e se existir retorna o seu id.
+        //Faz logo a verificação da existência do parent
+        //Este método deve ser utilizado em Creates onde a child ainda não existe e necessita do id do parent.
         private static int GetParentId(SqlConnection db, string parentType, string parentName)
         {
             var cmd = new SqlCommand("SELECT Id FROM " + parentType + " WHERE Name=@ParentName", db);
@@ -166,10 +170,10 @@ namespace SOMIOD.Helpers
         #endregion Application
 
         #region Module
-
-        private static int IsModuleParentValid(SqlConnection db, string appName, string moduleName)
+        
+        private static void IsModuleParentValid(SqlConnection db, string appName, string moduleName)
         {
-            return IsParentValid(db, "Application", appName, "Module", moduleName);
+            IsParentValid(db, "Application", appName, "Module", moduleName);
         }
 
         private static void ProcessSqlExceptionModule(SqlException e)
