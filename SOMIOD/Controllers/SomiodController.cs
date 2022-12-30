@@ -65,7 +65,7 @@ namespace SOMIOD.Controllers
                 if (newAppDetails == null)
                     throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
 
-                if (newAppDetails.Name == null || newAppDetails.Name == "")
+                if (string.IsNullOrEmpty(newAppDetails.Name))
                     throw new UnprocessableEntityException("You must include the updated name of the application");
 
                 string newName = newAppDetails.Name;
@@ -106,7 +106,18 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // POST: api/Somiod
+        [Route("api/Somiod/{appName}/modules/{moduleName}")]
+        public HttpResponseMessage GetModule(string appName, string moduleName)
+        {
+            try {
+                var module = DbHelper.GetModule(appName, moduleName);
+                return RequestHelper.CreateMessage(Request, module);
+            }
+            catch (Exception e) {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
         [Route("api/Somiod/{application}")]
         public HttpResponseMessage Post(string application, [FromBody] Module newModule)
         {
@@ -126,7 +137,25 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // DELETE: api/Somiod/application/module
+        [Route("api/Somiod/{appName}/modules/{moduleName}")]
+        public HttpResponseMessage Put(string appName, string moduleName, [FromBody] Module newModuleDetails)
+        {
+            try {
+                if (newModuleDetails == null)
+                    throw new UnprocessableEntityException("You must provide a module with a name in the correct xml format");
+
+                if (string.IsNullOrEmpty(newModuleDetails.Name))
+                    throw new UnprocessableEntityException("You must include the updated name of the module");
+
+                string newName = newModuleDetails.Name;
+                DbHelper.UpdateModule(appName, moduleName, newName);
+                return Request.CreateResponse(HttpStatusCode.OK, "Module updated");
+            }
+            catch (Exception e) {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
         [Route("api/Somiod/{application}/{module}")]
         public HttpResponseMessage Delete(string application, string module)
         {

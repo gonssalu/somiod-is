@@ -207,6 +207,23 @@ namespace SOMIOD.Helpers
             return modules;
         }
 
+        public static Module GetModule(string appName, string moduleName)
+        {
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+                var cmd = new SqlCommand("SELECT * FROM Module m JOIN Application a ON (m.Parent = a.Id) WHERE a.Name=@AppName AND m.Name=@ModuleName", db);
+                cmd.Parameters.AddWithValue("@AppName", appName);
+                cmd.Parameters.AddWithValue("@ModuleName", moduleName);
+                var reader = cmd.ExecuteReader();
+
+                if (reader.Read()) {
+                    return new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3));
+                } else {
+                    throw new ModelNotFoundException("Module");
+                }
+            }
+        }
+
         public static void CreateModule(string appName, string moduleName)
         {
             using (var dbConn = new DbConnection()) {
@@ -226,6 +243,29 @@ namespace SOMIOD.Helpers
 
                     if (rowChng != 1)
                         throw new UntreatedSqlException();
+                }
+                catch (SqlException e) {
+                    ProcessSqlExceptionModule(e);
+                }
+            }
+        }
+        
+        public static void UpdateModule(string appName, string moduleName, string newModuleName)
+        {
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+
+                IsModuleParentValid(db, appName, moduleName);
+
+                var cmd = new SqlCommand("UPDATE Module SET Name=@NewName WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", moduleName);
+                cmd.Parameters.AddWithValue("@NewName", newModuleName);
+
+                try {
+                    int rowChng = cmd.ExecuteNonQuery();
+
+                    if (rowChng != 1)
+                        throw new ModelNotFoundException("Module");
                 }
                 catch (SqlException e) {
                     ProcessSqlExceptionModule(e);
