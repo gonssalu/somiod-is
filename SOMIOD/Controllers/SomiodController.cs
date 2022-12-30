@@ -91,6 +91,25 @@ namespace SOMIOD.Controllers
         #endregion
 
         #region Module
+        
+        // POST: api/Somiod
+        [Route("api/Somiod/{application}")]
+        public HttpResponseMessage Post(string application, [FromBody] Module newModule)
+        {
+            try
+            {
+                if (newModule == null)
+                    throw new UnprocessableEntityException("You must provide a module with a name in the correct xml format");
+                if (newModule.Name == null || newModule.Name == "")
+                    throw new UnprocessableEntityException("You must include the name of your new module");
+                DbHelper.CreateModule(application, newModule.Name);
+                return RequestHelper.CreateMessage(Request, "Module created");
+            }
+            catch (Exception e)
+            {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
 
         // DELETE: api/Somiod/application/module
         [Route("api/Somiod/{application}/{module}")]

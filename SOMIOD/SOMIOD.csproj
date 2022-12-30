@@ -165,6 +165,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\SomiodController.cs" />
+    <Compile Include="Exceptions\UntreatedSqlException.cs" />
     <Compile Include="Exceptions\UnprocessableEntityException.cs" />
     <Compile Include="Exceptions\ModelNotFoundException.cs" />
     <Compile Include="Global.asax.cs">

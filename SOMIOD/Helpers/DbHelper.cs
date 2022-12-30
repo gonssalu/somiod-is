@@ -11,11 +11,11 @@ namespace SOMIOD.Helpers
     public static class DbHelper
     {
         #region Generic Methods
-        private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
+        private static int IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
                 new
-                    SqlCommand("SELECT * FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
+                    SqlCommand("SELECT p.Id, c.Id FROM " + childType + " c JOIN " + parentType + " p ON (c.Parent = p.Id) WHERE p.Name=@ParentName AND c.Name=@ChildName",
                                db);
             cmd.Parameters.AddWithValue("@ParentName", parentName);
             cmd.Parameters.AddWithValue("@ChildName", childName);
@@ -25,8 +25,21 @@ namespace SOMIOD.Helpers
                 throw new
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
-
+            var parentId = reader.GetInt32(0);
             reader.Close();
+            return parentId;
+        }
+        private static int GetParentId(SqlConnection db, string parentType, string parentName)
+        {
+            var cmd = new SqlCommand("SELECT Id FROM " + parentType + " WHERE Name=@ParentName", db);
+            cmd.Parameters.AddWithValue("@ParentName", parentName);
+            var reader = cmd.ExecuteReader();
+
+            if (!reader.Read())
+                throw new ModelNotFoundException("Couldn't find " + parentType.ToLower() + " '" + parentName + "'", false);
+            var parentId = reader.GetInt32(0);
+            reader.Close();
+            return parentId;
         }
 
         #endregion
@@ -92,7 +105,7 @@ namespace SOMIOD.Helpers
                 {
                     int rowChng = cmd.ExecuteNonQuery();
                     if (rowChng != 1)
-                        throw new ModelNotFoundException("Application");
+                        throw new UntreatedSqlException();
                 }
                 catch (SqlException e)
                 {
@@ -154,9 +167,47 @@ namespace SOMIOD.Helpers
 
         #region Module
 
-        private static void IsModuleParentValid(SqlConnection db, string appName, string moduleName)
+        private static int IsModuleParentValid(SqlConnection db, string appName, string moduleName)
         {
-            IsParentValid(db, "Application", appName, "Module", moduleName);
+            return IsParentValid(db, "Application", appName, "Module", moduleName);
+        }
+
+        private static void ProcessSqlExceptionModule(SqlException e)
+        {
+            switch (e.Number)
+            {
+                //Cannot insert duplicate key in object
+                case 2627:
+                    throw new UnprocessableEntityException("A module with that name already exists");
+                default:
+                    throw new UntreatedSqlException(e);
+            }
+        }
+
+        public static void CreateModule(string appName, string moduleName)
+        {
+            using (var dbConn = new DbConnection())
+            {
+                var db = dbConn.Open();
+                
+                var parentId = GetParentId(db, "Application", appName);
+
+                var cmd = new SqlCommand("INSERT INTO Module (Name, CreationDate, Parent) VALUES (@Name, @CreationDate, @Parent)", db);
+                cmd.Parameters.AddWithValue("@Name", moduleName);
+                cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@Parent", parentId);
+                
+                try
+                {
+                    int rowChng = cmd.ExecuteNonQuery();
+                    if (rowChng != 1)
+                        throw new UntreatedSqlException();
+                }
+                catch (SqlException e)
+                {
+                    ProcessSqlExceptionModule(e);
+                }
+            }
         }
 
         public static void DeleteModule(string appName, string moduleName)
