@@ -2,7 +2,9 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using SOMIOD.Exceptions;
 using SOMIOD.Helpers;
+using SOMIOD.Models;
 
 namespace SOMIOD.Controllers
 {
@@ -38,25 +40,33 @@ namespace SOMIOD.Controllers
 
         // POST: api/Somiod
         [Route("api/Somiod")]
-        public HttpResponseMessage Post([FromBody] string name)
+        public HttpResponseMessage Post([FromBody] Application newApp)
         {
-            try {
-                DbHelper.CreateApplication(name);
+            try
+            {
+                if (newApp == null)
+                    throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
+                if (newApp.Name == null || newApp.Name == "")
+                    throw new UnprocessableEntityException("You must include the name of your new application");
+                DbHelper.CreateApplication(newApp.Name);
                 return RequestHelper.CreateMessage(Request, "Application created");
             }
             catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
             }
         }
-
-        // public void Put(int id, [FromBody] string value)
-        // {
-        // }
+        
         //// PUT: api/Somiod/application
         [Route("api/Somiod/{application}")]
-        public HttpResponseMessage Put(string application, [FromBody] string newName)
+        public HttpResponseMessage Put(string application, [FromBody] Application newAppDetails)
         {
-            try {
+            try
+            {
+                if (newAppDetails == null)
+                    throw new UnprocessableEntityException("You must provide an application with a name in the correct xml format");
+                if (newAppDetails.Name == null || newAppDetails.Name == "")
+                    throw new UnprocessableEntityException("You must include the updated name of the application");
+                string newName = newAppDetails.Name;
                 DbHelper.UpdateApplication(application, newName);
                 return Request.CreateResponse(HttpStatusCode.OK, "Application updated");
             }

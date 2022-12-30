@@ -11,7 +11,6 @@ namespace SOMIOD.Helpers
     public static class DbHelper
     {
         #region Generic Methods
-
         private static void IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
@@ -69,29 +68,36 @@ namespace SOMIOD.Helpers
             }
         }
 
+        private static void ProcessSqlExceptionApplication(SqlException e)
+        {
+            switch (e.Number)
+            {
+                //Cannot insert duplicate key in object
+                case 2627:
+                    throw new UnprocessableEntityException("An application with that name already exists");
+                default:
+                    throw new UntreatedSqlException(e);
+            }
+        }
+
         public static void CreateApplication(string name)
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
-                //Check if app with that name exists
-                var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
-                cmd.Parameters.AddWithValue("@Name", name);
-                var reader = cmd.ExecuteReader();
-
-                if (reader.Read()) {
-                    throw new UnprocessableEntityException("An application with that name already exists");
-                }
-
-                reader.Close();
-
-                cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
+                var cmd = new SqlCommand("INSERT INTO Application (Name, CreationDate) VALUES (@Name, @CreationDate)", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
-                int rowChng = cmd.ExecuteNonQuery();
-
-                if (rowChng != 1)
-                    throw new Exception("An unknown error as occurred");
+                try
+                {
+                    int rowChng = cmd.ExecuteNonQuery();
+                    if (rowChng != 1)
+                        throw new ModelNotFoundException("Application");
+                }
+                catch (SqlException e)
+                {
+                    ProcessSqlExceptionApplication(e);
+                }
             }
         }
 
@@ -99,13 +105,24 @@ namespace SOMIOD.Helpers
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
+                
+                //Check if app with that name exists
+                //CheckAppNameIsFree(db, newName);
+
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@NewName", newName);
-                int rowChng = cmd.ExecuteNonQuery();
+                try
+                {
+                    int rowChng = cmd.ExecuteNonQuery();
+                    if (rowChng != 1)
+                        throw new ModelNotFoundException("Application");
+                }
+                catch(SqlException e)
+                {
+                    ProcessSqlExceptionApplication(e);
+                }
 
-                if (rowChng != 1)
-                    throw new ModelNotFoundException("Application");
             }
         }
 

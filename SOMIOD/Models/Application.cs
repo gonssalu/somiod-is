@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOMIOD.Exceptions;
+using System;
 using System.Xml.Serialization;
 
 namespace SOMIOD.Models
