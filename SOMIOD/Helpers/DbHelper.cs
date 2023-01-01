@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Web.Security;
-using System.Web.UI;
 using SOMIOD.Exceptions;
 using SOMIOD.Models;
 using SOMIOD.Properties;
@@ -32,7 +30,7 @@ namespace SOMIOD.Helpers
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
 
-            var childId = reader.GetInt32(0);
+            int childId = reader.GetInt32(0);
             reader.Close();
             return childId;
         }
@@ -49,7 +47,7 @@ namespace SOMIOD.Helpers
             if (!reader.Read())
                 throw new ModelNotFoundException("Couldn't find " + parentType.ToLower() + " '" + parentName + "'", false);
 
-            var parentId = reader.GetInt32(0);
+            int parentId = reader.GetInt32(0);
             reader.Close();
             return parentId;
         }
@@ -79,8 +77,6 @@ namespace SOMIOD.Helpers
 
         public static Application GetApplication(string name)
         {
-            var applications = new List<Application>();
-
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Application WHERE Name=@Name", db);
@@ -220,7 +216,7 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
-                var moduleId = IsModuleParentValid(db, appName, moduleName);
+                int moduleId = IsModuleParentValid(db, appName, moduleName);
 
                 var cmd = new SqlCommand("SELECT * FROM Module WHERE Id=@Id", db);
                 cmd.Parameters.AddWithValue("@Id", moduleId);
