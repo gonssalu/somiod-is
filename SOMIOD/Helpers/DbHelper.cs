@@ -31,6 +31,7 @@ namespace SOMIOD.Helpers
                 throw new
                     ModelNotFoundException("Couldn't find " + childType.ToLower() + " '" + childName + "' in " + parentType.ToLower() + " '" + parentName + "'",
                                            false);
+
             var childId = reader.GetInt32(0);
             reader.Close();
             return childId;
@@ -69,6 +70,7 @@ namespace SOMIOD.Helpers
                 while (reader.Read()) {
                     applications.Add(new Application(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2)));
                 }
+
                 reader.Close();
             }
 
@@ -206,6 +208,7 @@ namespace SOMIOD.Helpers
                 while (reader.Read()) {
                     modules.Add(new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
                 }
+
                 reader.Close();
             }
 
@@ -227,7 +230,6 @@ namespace SOMIOD.Helpers
 
                 if (reader.Read()) {
                     return new ModuleWithData(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3), data);
-                    
                 } else {
                     throw new UntreatedSqlException();
                 }
@@ -257,7 +259,7 @@ namespace SOMIOD.Helpers
                 }
             }
         }
-        
+
         public static void UpdateModule(string appName, string moduleName, string newModuleName)
         {
             using (var dbConn = new DbConnection()) {
@@ -315,6 +317,50 @@ namespace SOMIOD.Helpers
 
         #region Subscription
 
+        public static void CreateSubscription(string appName, string moduleName, Subscription subscription)
+        {
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+
+                int parentId = IsModuleParentValid(db, appName, moduleName);
+
+                var cmd = new SqlCommand(
+                    "INSERT INTO Subscription (Name, CreationDate, Parent, Event, Endpoint) VALUES (@Name, @CreationDate, @Parent, @Event, @Endpoint)",
+                    db);
+                cmd.Parameters.AddWithValue("@Name", subscription.Name.ToLower());
+                cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@Parent", parentId);
+                cmd.Parameters.AddWithValue("@Event", subscription.EventType.ToLower());
+                cmd.Parameters.AddWithValue("@Endpoint", subscription.Endpoint.ToLower());
+
+                try {
+                    int rowChng = cmd.ExecuteNonQuery();
+
+                    if (rowChng != 1)
+                        throw new UntreatedSqlException();
+                }
+                catch (SqlException e) {
+                    ProcessSqlExceptionModule(e);
+                }
+            }
+        }
+
+        public static void DeleteSubscription(string appName, string moduleName, string subscriptionName)
+        {
+            using (var dbConn = new DbConnection()) {
+                var db = dbConn.Open();
+
+                IsModuleParentValid(db, appName, moduleName);
+
+                var cmd = new SqlCommand("DELETE FROM Subscription WHERE Name=@Name", db);
+                cmd.Parameters.AddWithValue("@Name", subscriptionName.ToLower());
+                int rowChng = cmd.ExecuteNonQuery();
+
+                if (rowChng != 1)
+                    throw new ModelNotFoundException("Subscription");
+            }
+        }
+
         #endregion Subscription
 
         #region Data
@@ -323,18 +369,17 @@ namespace SOMIOD.Helpers
         {
             var dataRes = new List<Data>();
 
-            using (var dbConn = new DbConnection())
-            {
+            using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                
+
                 var cmd = new SqlCommand("SELECT * FROM Data WHERE Parent=@Parent", db);
                 cmd.Parameters.AddWithValue("@Parent", parentId);
                 var reader = cmd.ExecuteReader();
 
-                while (reader.Read())
-                {
+                while (reader.Read()) {
                     dataRes.Add(new Data(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
                 }
+
                 reader.Close();
             }
 
@@ -343,8 +388,7 @@ namespace SOMIOD.Helpers
 
         public static void CreateData(string appName, string moduleName, string dataContent)
         {
-            using (var dbConn = new DbConnection())
-            {
+            using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
                 IsModuleParentValid(db, appName, moduleName);
@@ -356,8 +400,7 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@Parent", parentId);
 
-                try
-                {
+                try {
                     int rowChng = cmd.ExecuteNonQuery();
 
                     if (rowChng != 1)
@@ -365,25 +408,23 @@ namespace SOMIOD.Helpers
 
                     //TODO: Notify Create Subscriptions
                 }
-                catch (SqlException e)
-                {
+                catch (SqlException e) {
                     ProcessSqlExceptionModule(e);
                 }
             }
         }
         public static void DeleteData(string appName, string moduleName, int dataId)
         {
-            using (var dbConn = new DbConnection())
-            {
+            using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
                 IsModuleParentValid(db, appName, moduleName);
 
                 var cmd =
-                new
-                    SqlCommand(
-                    "SELECT * FROM Module m JOIN Data d ON (d.Parent = m.Id) WHERE d.Id=@DataId AND m.Name=@ModuleName",
-                    db);
+                    new
+                        SqlCommand(
+                        "SELECT * FROM Module m JOIN Data d ON (d.Parent = m.Id) WHERE d.Id=@DataId AND m.Name=@ModuleName",
+                        db);
                 cmd.Parameters.AddWithValue("@DataId", dataId);
                 cmd.Parameters.AddWithValue("@ModuleName", moduleName.ToLower());
                 var reader = cmd.ExecuteReader();
@@ -401,9 +442,10 @@ namespace SOMIOD.Helpers
                 if (rowChng != 1)
                     throw new UntreatedSqlException();
 
-                //TODO: Notify Delete Subscriptions
+                // TODO: Notify Delete Subscriptions
             }
         }
+
         #endregion Data
 
         private class DbConnection : IDisposable

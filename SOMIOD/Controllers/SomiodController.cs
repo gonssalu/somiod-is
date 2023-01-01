@@ -164,13 +164,46 @@ namespace SOMIOD.Controllers
 
         #endregion
 
+        #region Subscription
+
+        [Route("api/somiod/{application}/{module}/subscriptions")]
+        public HttpResponseMessage PostSubscription(string application, string module, [FromBody] Subscription newSubscription)
+        {
+            try {
+                if (newSubscription == null)
+                    throw new UnprocessableEntityException("You must provide a subscription with a valid url in the correct xml format");
+
+                if (string.IsNullOrEmpty(newSubscription.Endpoint))
+                    throw new UnprocessableEntityException("You must include a url for that subscription");
+
+                DbHelper.CreateSubscription(application, module, newSubscription);
+                return RequestHelper.CreateMessage(Request, "Subscription created");
+            }
+            catch (Exception e) {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
+        [Route("api/somiod/{application}/{module}/subscriptions/{subscription}")]
+        public HttpResponseMessage DeleteSubscription(string application, string module, string subscription)
+        {
+            try {
+                DbHelper.DeleteSubscription(application, module, subscription);
+                return Request.CreateResponse(HttpStatusCode.OK, "Subscription was deleted");
+            }
+            catch (Exception e) {
+                return RequestHelper.CreateError(Request, e);
+            }
+        }
+
+        #endregion
+
         #region Data
 
         [Route("api/somiod/{application}/{module}")]
         public HttpResponseMessage PostData(string application, string module, [FromBody] Data newData)
         {
-            try
-            {
+            try {
                 if (newData == null)
                     throw new UnprocessableEntityException("You must provide a data resource with a valid content in the correct xml format");
 
@@ -180,8 +213,7 @@ namespace SOMIOD.Controllers
                 DbHelper.CreateData(application, module, newData.Content);
                 return RequestHelper.CreateMessage(Request, "Data resource created");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
             }
         }
@@ -189,13 +221,11 @@ namespace SOMIOD.Controllers
         [Route("api/somiod/{application}/{module}/{dataId}")]
         public HttpResponseMessage DeleteData(string application, string module, int dataId)
         {
-            try
-            {
+            try {
                 DbHelper.DeleteData(application, module, dataId);
                 return Request.CreateResponse(HttpStatusCode.OK, "Data resource was deleted");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return RequestHelper.CreateError(Request, e);
             }
         }
