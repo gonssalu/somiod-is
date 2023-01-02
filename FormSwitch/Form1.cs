@@ -70,8 +70,7 @@ namespace FormSwitch
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs args)
         {
             string message = Encoding.UTF8.GetString(args.Message);
-            MessageBox.Show($"message == ON {message == "ON"}");
-            _turnLightBulbOn = message == "ON";
+            _turnLightBulbOn = message.ToUpper() == "ON";
             UpdateLightBulbState();
         }
 
@@ -102,7 +101,7 @@ namespace FormSwitch
             byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
             _mClient.Subscribe(Topic, qosLevels);
 
-            MessageBox.Show("Subscribed to topics", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // MessageBox.Show("Subscribed to topics", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -121,8 +120,13 @@ namespace FormSwitch
             if (CheckEntityAlreadyExists(response))
                 return;
 
+            if (response.StatusCode == 0) {
+                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (response.StatusCode != HttpStatusCode.OK) {
-                MessageBox.Show("Could not create application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -142,8 +146,13 @@ namespace FormSwitch
             if (CheckEntityAlreadyExists(response))
                 return;
 
+            if (response.StatusCode == 0) {
+                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (response.StatusCode != HttpStatusCode.OK) {
-                MessageBox.Show("Could not create module", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -163,8 +172,13 @@ namespace FormSwitch
             if (CheckEntityAlreadyExists(response))
                 return;
 
+            if (response.StatusCode == 0) {
+                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (response.StatusCode != HttpStatusCode.OK) {
-                MessageBox.Show("Could not create subscription", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
