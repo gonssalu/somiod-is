@@ -42,6 +42,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="M2Mqtt.Net, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\M2Mqtt.4.3.0.0\lib\net45\M2Mqtt.Net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Http.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
     </Reference>
@@ -173,7 +176,11 @@
     </Compile>
     <Compile Include="Helpers\MimeTypesOperationFilter.cs" />
     <Compile Include="Helpers\DbHelper.cs" />
+    <Compile Include="Helpers\BrokerHelper.cs" />
+    <Compile Include="Exceptions\BrokerException.cs" />
+    <Compile Include="Helpers\XmlHelper.cs" />
     <Compile Include="Helpers\RequestHelper.cs" />
+    <Compile Include="Models\Serialization\Notification.cs" />
     <Compile Include="Models\Serialization\ModuleWithData.cs" />
     <Compile Include="Models\Subscription.cs" />
     <Compile Include="Models\Module.cs" />

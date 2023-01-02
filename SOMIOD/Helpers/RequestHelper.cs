@@ -26,21 +26,8 @@ namespace SOMIOD.Helpers
 
         public static HttpResponseMessage CreateMessage(HttpRequestMessage request, object obj)
         {
-            var xmlDoc = Serialize(obj);
+            var xmlDoc = XmlHelper.Serialize(obj);
             return request.CreateResponse(HttpStatusCode.OK, xmlDoc, "application/xml");
-        }
-
-        private static XmlDocument Serialize(object obj)
-        {
-            var xmlDoc = new XmlDocument();
-            var serializer = new XmlSerializer(obj.GetType());
-
-            using (var ms = new MemoryStream()) {
-                serializer.Serialize(ms, obj);
-                ms.Position = 0;
-                xmlDoc.Load(ms);
-                return xmlDoc;
-            }
         }
     }
 }

@@ -397,14 +397,34 @@ namespace SOMIOD.Helpers
             return dataRes;
         }
 
+        private static void NotifySubscriptions(SqlConnection db, int parentId, string moduleName, string eventType, string data)
+        {
+            try
+            {
+                var notification = new Notification(eventType, data);
+
+                var cmd = new SqlCommand("SELECT * FROM Subscription WHERE Parent=@Parent AND Event=@Event OR Event='BOTH'", db);
+                cmd.Parameters.AddWithValue("@Parent", parentId);
+                cmd.Parameters.AddWithValue("@Event", eventType.ToUpper());
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                    BrokerHelper.FireNotification(reader.GetString(5), moduleName, notification);
+
+                reader.Close();
+            }
+            catch(SqlException e)
+            {
+                throw new BrokerException("An unknown database error (#"+e.Number+") has happened while trying to notify subscriptions");
+            }
+        }
+
         public static void CreateData(string appName, string moduleName, string dataContent)
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-
-                IsModuleParentValid(db, appName, moduleName);
-
-                int parentId = GetParentId(db, "Module", moduleName);
+                
+                int parentId = IsModuleParentValid(db, appName, moduleName);
 
                 var cmd = new SqlCommand("INSERT INTO Data (Content, CreationDate, Parent) VALUES (@Content, @CreationDate, @Parent)", db);
                 cmd.Parameters.AddWithValue("@Content", dataContent);
@@ -417,7 +437,7 @@ namespace SOMIOD.Helpers
                     if (rowChng != 1)
                         throw new UntreatedSqlException();
 
-                    //TODO: Notify Create Subscriptions
+                    NotifySubscriptions(db, parentId, moduleName, "CREATE", dataContent);
                 }
                 catch (SqlException e) {
                     throw new UntreatedSqlException();
@@ -429,12 +449,12 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
-                IsModuleParentValid(db, appName, moduleName);
+                var parentId = IsModuleParentValid(db, appName, moduleName);
 
                 var cmd =
                     new
                         SqlCommand(
-                        "SELECT * FROM Module m JOIN Data d ON (d.Parent = m.Id) WHERE d.Id=@DataId AND m.Name=@ModuleName",
+                        "SELECT m.Id, d.Id, d.Content FROM Module m JOIN Data d ON (d.Parent = m.Id) WHERE d.Id=@DataId AND m.Name=@ModuleName",
                         db);
                 cmd.Parameters.AddWithValue("@DataId", dataId);
                 cmd.Parameters.AddWithValue("@ModuleName", moduleName.ToLower());
@@ -443,7 +463,7 @@ namespace SOMIOD.Helpers
                 if (!reader.Read())
                     throw new
                         ModelNotFoundException("A data resource with the Id #" + dataId + " does not exist in the module " + moduleName, false);
-
+                var dataContent = reader.GetString(2);
                 reader.Close();
 
                 cmd = new SqlCommand("DELETE FROM Data WHERE Id=@Id", db);
@@ -453,7 +473,7 @@ namespace SOMIOD.Helpers
                 if (rowChng != 1)
                     throw new UntreatedSqlException();
 
-                // TODO: Notify Delete Subscriptions
+                NotifySubscriptions(db, parentId, moduleName, "DELETE", dataContent);
             }
         }
 
