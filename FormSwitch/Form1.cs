@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
 using FormSwitch.Models;
@@ -30,6 +31,7 @@ namespace FormSwitch
 
         private MqttClient _mClient;
         private readonly RestClient _restClient = new RestClient(ApiBaseUri);
+        private bool _turnLightBulbOn;
 
         public Form1()
         {
@@ -53,6 +55,26 @@ namespace FormSwitch
             return false;
         }
 
+        private void UpdateLightBulbState()
+        {
+            if (_turnLightBulbOn) {
+                _turnLightBulbOn = true;
+                pbLightbulb.Image = Properties.Resources.light_bulb_on;
+                return;
+            }
+
+            _turnLightBulbOn = false;
+            pbLightbulb.Image = Properties.Resources.light_bulb_off;
+        }
+
+        private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs args)
+        {
+            string message = Encoding.UTF8.GetString(args.Message);
+            MessageBox.Show($"message == ON {message == "ON"}");
+            _turnLightBulbOn = message == "ON";
+            UpdateLightBulbState();
+        }
+
         #endregion
 
         #region Message Broker
@@ -74,11 +96,7 @@ namespace FormSwitch
         private void SubscribeToTopics()
         {
             // Msg arrived
-            _mClient.MqttMsgPublishReceived += (sender, args) =>
-                {
-                    string message = System.Text.Encoding.UTF8.GetString(args.Message);
-                    MessageBox.Show(message, "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                };
+            _mClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
 
             // Subscribe to topic
             byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
@@ -164,7 +182,6 @@ namespace FormSwitch
             CreateModule(ModuleName, ApplicationName);
             CreateSubscription(SubscriptionName, ModuleName, ApplicationName, EventType, Endpoint);
         }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_mClient.IsConnected) {

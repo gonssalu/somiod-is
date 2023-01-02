@@ -27,19 +27,34 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.pbLightbulb = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize) (this.pbLightbulb)).BeginInit();
             this.SuspendLayout();
+            // 
+            // pbLightbulb
+            // 
+            this.pbLightbulb.Image = global::FormSwitch.Properties.Resources.light_bulb_off;
+            this.pbLightbulb.Location = new System.Drawing.Point(12, 12);
+            this.pbLightbulb.Name = "pbLightbulb";
+            this.pbLightbulb.Size = new System.Drawing.Size(216, 222);
+            this.pbLightbulb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbLightbulb.TabIndex = 0;
+            this.pbLightbulb.TabStop = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(240, 246);
+            this.Controls.Add(this.pbLightbulb);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Shown += new System.EventHandler(this.Form1_Shown);
+            ((System.ComponentModel.ISupportInitialize) (this.pbLightbulb)).EndInit();
             this.ResumeLayout(false);
         }
+        private System.Windows.Forms.PictureBox pbLightbulb;
 
         #endregion
     }
