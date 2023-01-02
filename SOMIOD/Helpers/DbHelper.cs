@@ -185,7 +185,7 @@ namespace SOMIOD.Helpers
             switch (e.Number) {
                 //Cannot insert duplicate key in object
                 case 2627:
-                    throw new UnprocessableEntityException("A module with that name already exists");
+                    throw new UnprocessableEntityException("A module with that name already exists in that application");
                 default:
                     throw new UntreatedSqlException(e);
             }
@@ -313,6 +313,18 @@ namespace SOMIOD.Helpers
 
         #region Subscription
 
+        private static void ProcessSqlExceptionSubscription(SqlException e)
+        {
+            switch (e.Number)
+            {
+                //Cannot insert duplicate key in object
+                case 2627:
+                    throw new UnprocessableEntityException("A subscription with that name already exists in that module");
+                default:
+                    throw new UntreatedSqlException(e);
+            }
+        }
+
         public static void CreateSubscription(string appName, string moduleName, Subscription subscription)
         {
             using (var dbConn = new DbConnection()) {
@@ -326,7 +338,7 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@Name", subscription.Name.ToLower());
                 cmd.Parameters.AddWithValue("@CreationDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@Parent", parentId);
-                cmd.Parameters.AddWithValue("@Event", subscription.EventType.ToLower());
+                cmd.Parameters.AddWithValue("@Event", subscription.EventType.ToUpper());
                 cmd.Parameters.AddWithValue("@Endpoint", subscription.Endpoint.ToLower());
 
                 try {
@@ -336,7 +348,7 @@ namespace SOMIOD.Helpers
                         throw new UntreatedSqlException();
                 }
                 catch (SqlException e) {
-                    ProcessSqlExceptionModule(e);
+                    ProcessSqlExceptionSubscription(e);
                 }
             }
         }
@@ -408,7 +420,7 @@ namespace SOMIOD.Helpers
                     //TODO: Notify Create Subscriptions
                 }
                 catch (SqlException e) {
-                    ProcessSqlExceptionModule(e);
+                    throw new UntreatedSqlException();
                 }
             }
         }

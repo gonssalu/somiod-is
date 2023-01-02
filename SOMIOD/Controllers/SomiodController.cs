@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -10,6 +11,8 @@ namespace SOMIOD.Controllers
 {
     public class SomiodController : ApiController
     {
+        private readonly List<string> _VALID_EVENT_TYPES = new List<string>() { "CREATE", "DELETE", "BOTH" };
+
         #region Application
 
         [Route("api/somiod")]
@@ -173,8 +176,14 @@ namespace SOMIOD.Controllers
                 if (newSubscription == null)
                     throw new UnprocessableEntityException("You must provide a subscription with a valid url in the correct xml format");
 
+                if (string.IsNullOrEmpty(newSubscription.Name))
+                    throw new UnprocessableEntityException("You must include a name for that subscription");
+                
                 if (string.IsNullOrEmpty(newSubscription.Endpoint))
                     throw new UnprocessableEntityException("You must include a url for that subscription");
+                
+                if (!_VALID_EVENT_TYPES.Contains(newSubscription.EventType.ToUpper()))
+                    throw new UnprocessableEntityException("You must include a valid event for that subscription. Valid event types are: CREATE, DELETE, BOTH");
 
                 DbHelper.CreateSubscription(application, module, newSubscription);
                 return RequestHelper.CreateMessage(Request, "Subscription created");
