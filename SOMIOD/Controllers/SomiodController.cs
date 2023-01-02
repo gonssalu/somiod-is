@@ -180,10 +180,14 @@ namespace SOMIOD.Controllers
                     throw new UnprocessableEntityException("You must include a name for that subscription");
                 
                 if (string.IsNullOrEmpty(newSubscription.Endpoint))
-                    throw new UnprocessableEntityException("You must include a url for that subscription");
+                    throw new UnprocessableEntityException("You must include an endpoint for that subscription");
                 
+                if (!BrokerHelper.IsValidEndpoint(newSubscription.Endpoint))
+                    throw new UnprocessableEntityException("You must include a valid endpoint for that subscription");
+
                 if (!_VALID_EVENT_TYPES.Contains(newSubscription.EventType.ToUpper()))
                     throw new UnprocessableEntityException("You must include a valid event for that subscription. Valid event types are: CREATE, DELETE, BOTH");
+
 
                 DbHelper.CreateSubscription(application, module, newSubscription);
                 return RequestHelper.CreateMessage(Request, "Subscription created");
