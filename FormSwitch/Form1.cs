@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text.Json;
 using System.Windows.Forms;
 using FormSwitch.Models;
 using RestSharp;
@@ -15,10 +16,13 @@ namespace FormSwitch
         private static readonly string BrokerIp = "127.0.0.1";
         private static readonly string ApiBaseUri = @"http://localhost:44396/";
 
-        private static readonly HttpStatusCode EntityAlreadyExists = (HttpStatusCode) 422;
+        private static readonly HttpStatusCode CustomApiError = (HttpStatusCode) 422;
 
         private static readonly string ApplicationName = "lighting";
         private static readonly string ModuleName = "light_bulb";
+        private static readonly string SubscriptionName = "sub1";
+        private static readonly string EventType = "CREATE";
+        private static readonly string Endpoint = "mqtt://127.0.0.1:1883";
 
         // End of constants
 
@@ -28,6 +32,21 @@ namespace FormSwitch
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private string DeserializeError(RestResponse response)
+        {
+            var error = JsonSerializer.Deserialize<Error>(response.Content ?? string.Empty);
+            return error?.Message;
+        }
+
+        private bool CheckEntityAlreadyExists(RestResponse response)
+        {
+            if (response.StatusCode == CustomApiError)
+                if (DeserializeError(response).Contains("already exists"))
+                    return true;
+
+            return false;
         }
 
         private void ConnectToBroker()
@@ -53,7 +72,7 @@ namespace FormSwitch
 
             var response = _restClient.Execute(request);
 
-            if (response.StatusCode == EntityAlreadyExists)
+            if (CheckEntityAlreadyExists(response))
                 return;
 
             if (response.StatusCode != HttpStatusCode.OK) {
@@ -74,7 +93,7 @@ namespace FormSwitch
 
             var response = _restClient.Execute(request);
 
-            if (response.StatusCode == EntityAlreadyExists)
+            if (CheckEntityAlreadyExists(response))
                 return;
 
             if (response.StatusCode != HttpStatusCode.OK) {
@@ -86,11 +105,33 @@ namespace FormSwitch
             MessageBox.Show("Module created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private void CreateSubscription(string subscriptionName, string moduleName, string applicationName, string eventType, string endpoint)
+        {
+            var sub = new Subscription(subscriptionName, moduleName, eventType, endpoint);
+
+            var request = new RestRequest($"api/somiod/{applicationName}/{moduleName}/subscriptions", Method.Post);
+            request.AddObject(sub);
+
+            var response = _restClient.Execute(request);
+
+            if (CheckEntityAlreadyExists(response))
+                return;
+
+            if (response.StatusCode != HttpStatusCode.OK) {
+                MessageBox.Show("Could not create subscription", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // TODO: Remove this
+            MessageBox.Show("Subscription created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         private void Form1_Shown(object sender, EventArgs e)
         {
             ConnectToBroker();
             CreateApplication(ApplicationName);
             CreateModule(ModuleName, ApplicationName);
+            CreateSubscription(SubscriptionName, ModuleName, ApplicationName, EventType, Endpoint);
         }
     }
 }

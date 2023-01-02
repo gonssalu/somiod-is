@@ -87,8 +87,10 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Application.cs" />
+    <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Module.cs" />
     <Compile Include="Models\Result.cs" />
+    <Compile Include="Models\Subscription.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
