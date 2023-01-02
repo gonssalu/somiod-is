@@ -348,8 +348,11 @@ namespace SOMIOD.Helpers
 
                 IsModuleParentValid(db, appName, moduleName);
 
-                var cmd = new SqlCommand("DELETE FROM Subscription WHERE Name=@Name", db);
+                int parentId = GetParentId(db, "Module", moduleName);
+
+                var cmd = new SqlCommand("DELETE FROM Subscription WHERE Name=@Name AND Parent=@Parent", db);
                 cmd.Parameters.AddWithValue("@Name", subscriptionName.ToLower());
+                cmd.Parameters.AddWithValue("@Parent", parentId);
                 int rowChng = cmd.ExecuteNonQuery();
 
                 if (rowChng != 1)
