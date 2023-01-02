@@ -12,7 +12,7 @@ namespace FormSwitch.Models
     }
 
     [XmlRoot("Application")]
-    public abstract class Application
+    public class Application
     {
         [XmlElement("Id")]
         public int Id { get; set; }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Net;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
-using FormSwitch.Models;
 using RestSharp;
 using uPLibrary.Networking.M2Mqtt;
 using Application = FormSwitch.Models.Application;
@@ -15,6 +11,8 @@ namespace FormSwitch
     {
         private static readonly string BrokerIp = "127.0.0.1";
         private static readonly string ApiBaseUri = @"http://localhost:44396/";
+
+        private static readonly HttpStatusCode EntityAlreadyExists = (HttpStatusCode) 422;
 
         private MqttClient _mClient;
         private readonly RestClient _restClient = new RestClient(ApiBaseUri);
@@ -41,24 +39,28 @@ namespace FormSwitch
 
         private void CreateApplication()
         {
-            // var request = new RestRequest("api/applications", Method.Post)
-
-            var request = new RestRequest("api/somiod")
+            var app = new Application
             {
-                RequestFormat = DataFormat.Xml
+                Name = "lighting"
             };
 
-            // var response = _restClient.Execute<ApplicationList>(request);
-            var response = _restClient.Execute<List<Application>>(request).Data;
+            var request = new RestRequest("api/somiod", Method.Post);
+            // request.AddXmlBody(app);
+            request.AddObject(app);
 
-            foreach (var application in response) {
-                MessageBox.Show(application.Name);
+            var response = _restClient.Execute(request);
+
+            if (response.StatusCode == EntityAlreadyExists) {
+                MessageBox.Show("Application already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            // var application = response.Data;
-            //
-            // MessageBox.Show(response.Content);
-            // MessageBox.Show(response.Data.Applications?.Count.ToString());
+            if (response.StatusCode != HttpStatusCode.OK) {
+                MessageBox.Show("Could not create application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            MessageBox.Show("Application created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Form1_Shown(object sender, EventArgs e)
