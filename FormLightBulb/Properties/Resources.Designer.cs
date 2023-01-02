@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FormSwitch.Properties
+namespace FormLightBulb.Properties
 {
 
 

@@ -5,9 +5,9 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOMIOD", "SOMIOD\SOMIOD.csproj", "{AD765811-C2F0-4141-8235-D1CECC7F82D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormLightBulb", "FormSwitch\FormLightBulb.csproj", "{93441894-3885-41DF-A8A6-3B29951AA694}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormSwitch", "FormSwitch\FormSwitch.csproj", "{93441894-3885-41DF-A8A6-3B29951AA694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormSwitch", "FormLightBulb\FormSwitch.csproj", "{73C04FB1-A57E-49E5-92BF-E08726F4AFD0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormLightBulb", "FormLightBulb\FormLightBulb.csproj", "{73C04FB1-A57E-49E5-92BF-E08726F4AFD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
