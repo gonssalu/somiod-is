@@ -1,4 +1,4 @@
-﻿namespace FormLightBulb
+﻿namespace FormSwitch
 {
     partial class Form1
     {
