@@ -178,7 +178,9 @@
     <Compile Include="Helpers\DbHelper.cs" />
     <Compile Include="Helpers\BrokerHelper.cs" />
     <Compile Include="Exceptions\BrokerException.cs" />
+    <Compile Include="Helpers\XmlHelper.cs" />
     <Compile Include="Helpers\RequestHelper.cs" />
+    <Compile Include="Models\Serialization\Notification.cs" />
     <Compile Include="Models\Serialization\ModuleWithData.cs" />
     <Compile Include="Models\Subscription.cs" />
     <Compile Include="Models\Module.cs" />
