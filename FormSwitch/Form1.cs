@@ -5,13 +5,14 @@ using System.Windows.Forms;
 using FormSwitch.Models;
 using RestSharp;
 using uPLibrary.Networking.M2Mqtt;
+using uPLibrary.Networking.M2Mqtt.Messages;
 using Application = FormSwitch.Models.Application;
 
 namespace FormSwitch
 {
     public partial class Form1 : Form
     {
-        // Constants
+        #region Constants
 
         private static readonly string BrokerIp = "127.0.0.1";
         private static readonly string ApiBaseUri = @"http://localhost:44396/";
@@ -23,8 +24,9 @@ namespace FormSwitch
         private static readonly string SubscriptionName = "sub1";
         private static readonly string EventType = "CREATE";
         private static readonly string Endpoint = "mqtt://127.0.0.1:1883";
+        private static readonly string[] Topic = { "light_bulb" };
 
-        // End of constants
+        #endregion
 
         private MqttClient _mClient;
         private readonly RestClient _restClient = new RestClient(ApiBaseUri);
@@ -33,6 +35,8 @@ namespace FormSwitch
         {
             InitializeComponent();
         }
+
+        #region Helpers
 
         private string DeserializeError(RestResponse response)
         {
@@ -49,6 +53,10 @@ namespace FormSwitch
             return false;
         }
 
+        #endregion
+
+        #region Message Broker
+
         private void ConnectToBroker()
         {
             _mClient = new MqttClient(BrokerIp);
@@ -62,6 +70,26 @@ namespace FormSwitch
 
             // MessageBox.Show("Connected to the message broker", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void SubscribeToTopics()
+        {
+            // Msg arrived
+            _mClient.MqttMsgPublishReceived += (sender, args) =>
+                {
+                    string message = System.Text.Encoding.UTF8.GetString(args.Message);
+                    MessageBox.Show(message, "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                };
+
+            // Subscribe to topic
+            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+            _mClient.Subscribe(Topic, qosLevels);
+
+            MessageBox.Show("Subscribed to topics", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        #endregion
+
+        #region API Calls
 
         private void CreateApplication(string applicationName)
         {
@@ -126,12 +154,23 @@ namespace FormSwitch
             MessageBox.Show("Subscription created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        #endregion
+
         private void Form1_Shown(object sender, EventArgs e)
         {
             ConnectToBroker();
+            SubscribeToTopics();
             CreateApplication(ApplicationName);
             CreateModule(ModuleName, ApplicationName);
             CreateSubscription(SubscriptionName, ModuleName, ApplicationName, EventType, Endpoint);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (_mClient.IsConnected) {
+                _mClient.Unsubscribe(Topic);
+                _mClient.Disconnect();
+            }
         }
     }
 }
