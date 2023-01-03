@@ -226,6 +226,8 @@ namespace SOMIOD.Controllers
                 return RequestHelper.CreateMessage(Request, "Data resource created");
             }
             catch (Exception e) {
+                if(e is BrokerException)
+                    return RequestHelper.CreateMessage(Request, "Data resource was created, but could not notify at least one o the subscribers. Error: " + e.Message);
                 return RequestHelper.CreateError(Request, e);
             }
         }
@@ -237,7 +239,10 @@ namespace SOMIOD.Controllers
                 DbHelper.DeleteData(application, module, dataId);
                 return Request.CreateResponse(HttpStatusCode.OK, "Data resource was deleted");
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
+                if (e is BrokerException)
+                    return RequestHelper.CreateMessage(Request, "Data resource was deleted, but could not notify at least one o the subscribers. Error: " + e.Message);
                 return RequestHelper.CreateError(Request, e);
             }
         }
