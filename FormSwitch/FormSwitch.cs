@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using FormSwitch.Models;
 using RestSharp;
 using static FormSwitch.Properties.Settings;
-using Application = FormSwitch.Models.Application;
 
 namespace FormSwitch
 {
@@ -48,27 +47,6 @@ namespace FormSwitch
         #endregion
 
         #region API Calls
-
-        private void CreateApplication(string applicationName)
-        {
-            var app = new Application(applicationName);
-
-            var request = new RestRequest("api/somiod", Method.Post);
-            request.AddObject(app);
-
-            var response = _restClient.Execute(request);
-
-            if (CheckEntityAlreadyExists(response))
-                return;
-
-            if (response.StatusCode == 0) {
-                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (response.StatusCode != HttpStatusCode.OK)
-                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
 
         private void CreateModule(string moduleName, string applicationName)
         {
@@ -122,7 +100,6 @@ namespace FormSwitch
         }
         private void FormSwitch_Shown(object sender, EventArgs e)
         {
-            CreateApplication(ApplicationName);
             CreateModule(ModuleName, ApplicationName);
         }
     }
