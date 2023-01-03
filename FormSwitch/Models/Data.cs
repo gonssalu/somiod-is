@@ -1,7 +1,6 @@
-﻿using System;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
-namespace SOMIOD.Models
+namespace FormSwitch.Models
 {
     [XmlRoot(ElementName = "Data")]
     public class Data

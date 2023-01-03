@@ -23,39 +23,51 @@ namespace FormSwitch.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:44396/")]
         public string ApiBaseUri {
             get {
                 return ((string)(this["ApiBaseUri"]));
             }
-            set {
-                this["ApiBaseUri"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("lighting")]
         public string ApplicationName {
             get {
                 return ((string)(this["ApplicationName"]));
             }
-            set {
-                this["ApplicationName"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("light_command")]
+        public string ModuleName {
+            get {
+                return ((string)(this["ModuleName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("422")]
+        public int CustomApiError {
+            get {
+                return ((int)(this["CustomApiError"]));
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("light_bulb")]
-        public string ModuleName {
+        public string ModuleToSendData {
             get {
-                return ((string)(this["ModuleName"]));
+                return ((string)(this["ModuleToSendData"]));
             }
             set {
-                this["ModuleName"] = value;
+                this["ModuleToSendData"] = value;
             }
         }
     }

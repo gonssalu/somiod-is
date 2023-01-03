@@ -63,6 +63,7 @@
             this.MaximizeBox = false;
             this.Name = "FormSwitch";
             this.Text = "Switch";
+            this.Shown += new System.EventHandler(this.FormSwitch_Shown);
             this.ResumeLayout(false);
         }
 

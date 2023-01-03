@@ -25,15 +25,6 @@ namespace FormLightBulb.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mqtt://127.0.0.1:1883")]
-        public string Endpoint {
-            get {
-                return ((string)(this["Endpoint"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("light_bulb")]
         public string Topic {
             get {
@@ -101,6 +92,15 @@ namespace FormLightBulb.Properties {
         public string EventType {
             get {
                 return ((string)(this["EventType"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string Endpoint {
+            get {
+                return ((string)(this["Endpoint"]));
             }
         }
     }

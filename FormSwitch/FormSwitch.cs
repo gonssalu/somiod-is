@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net;
+using System.Text.Json;
 using System.Windows.Forms;
+using FormSwitch.Models;
 using RestSharp;
-using SOMIOD.Models;
 using static FormSwitch.Properties.Settings;
+using Application = FormSwitch.Models.Application;
 
 namespace FormSwitch
 {
@@ -14,6 +16,8 @@ namespace FormSwitch
         private static readonly string ApiBaseUri = Default.ApiBaseUri;
         private static readonly string ApplicationName = Default.ApplicationName;
         private static readonly string ModuleName = Default.ModuleName;
+        private static readonly string ModuleToSendData = Default.ModuleToSendData;
+        private static readonly HttpStatusCode CustomApiError = (HttpStatusCode) Default.CustomApiError;
 
         #endregion
 
@@ -24,21 +28,86 @@ namespace FormSwitch
             InitializeComponent();
         }
 
+        #region Helpers
+
+        private string DeserializeError(RestResponse response)
+        {
+            var error = JsonSerializer.Deserialize<Error>(response.Content ?? string.Empty);
+            return error?.Message;
+        }
+
+        private bool CheckEntityAlreadyExists(RestResponse response)
+        {
+            if (response.StatusCode == CustomApiError)
+                if (DeserializeError(response).Contains("already exists"))
+                    return true;
+
+            return false;
+        }
+
+        #endregion
+
+        #region API Calls
+
+        private void CreateApplication(string applicationName)
+        {
+            var app = new Application(applicationName);
+
+            var request = new RestRequest("api/somiod", Method.Post);
+            request.AddObject(app);
+
+            var response = _restClient.Execute(request);
+
+            if (CheckEntityAlreadyExists(response))
+                return;
+
+            if (response.StatusCode == 0) {
+                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (response.StatusCode != HttpStatusCode.OK)
+                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void CreateModule(string moduleName, string applicationName)
+        {
+            var mod = new Module(moduleName, applicationName);
+
+            var request = new RestRequest($"api/somiod/{applicationName}", Method.Post);
+            request.AddObject(mod);
+
+            var response = _restClient.Execute(request);
+
+            if (CheckEntityAlreadyExists(response))
+                return;
+
+            if (response.StatusCode == 0) {
+                MessageBox.Show("Could not connect to the API", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (response.StatusCode != HttpStatusCode.OK)
+                MessageBox.Show("An error occurred while creating the module", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        #endregion
+
         private void btnOn_Click(object sender, EventArgs e)
         {
-            CreateData(ApplicationName, ModuleName, "ON");
+            CreateData(ApplicationName, ModuleToSendData, "ON");
         }
 
         private void btnOff_Click(object sender, EventArgs e)
         {
-            CreateData(ApplicationName, ModuleName, "OFF");
+            CreateData(ApplicationName, ModuleToSendData, "OFF");
         }
 
-        private void CreateData(string appName, string moduleName, string content)
+        private void CreateData(string appName, string moduleToSendData, string content)
         {
             var mod = new Data(content);
 
-            var request = new RestRequest($"api/somiod/{appName}/{moduleName}/data", Method.Post);
+            var request = new RestRequest($"api/somiod/{appName}/{moduleToSendData}/data", Method.Post);
             request.AddObject(mod);
 
             var response = _restClient.Execute(request);
@@ -50,6 +119,11 @@ namespace FormSwitch
 
             if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        private void FormSwitch_Shown(object sender, EventArgs e)
+        {
+            CreateApplication(ApplicationName);
+            CreateModule(ModuleName, ApplicationName);
         }
     }
 }
