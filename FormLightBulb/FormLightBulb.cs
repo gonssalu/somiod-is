@@ -11,7 +11,7 @@ using Application = FormLightBulb.Models.Application;
 
 namespace FormLightBulb
 {
-    public partial class Form1 : Form
+    public partial class FormLightBulb : Form
     {
         #region Constants
 
@@ -33,7 +33,7 @@ namespace FormLightBulb
         private readonly RestClient _restClient = new RestClient(ApiBaseUri);
         private bool _turnLightBulbOn;
 
-        public Form1()
+        public FormLightBulb()
         {
             InitializeComponent();
         }
@@ -197,17 +197,12 @@ namespace FormLightBulb
             CreateSubscription(SubscriptionName, ModuleName, ApplicationName, EventType, Endpoint);
         }
 
-        private void Form1_FormClosing_1(object sender, FormClosingEventArgs e)
+        private void FormLightBulb_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_mClient.IsConnected) {
                 _mClient.Unsubscribe(Topic);
                 _mClient.Disconnect();
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
