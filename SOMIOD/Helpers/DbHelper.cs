@@ -289,16 +289,54 @@ namespace SOMIOD.Helpers
                 //Check if module has any data / subscription children
                 var cmd =
                     new
-                        SqlCommand("SELECT * FROM Module m JOIN Subscription s ON (m.Id = s.Parent) JOIN Data d ON (m.Id = d.Parent) WHERE m.Name=@Name",
+                        SqlCommand("SELECT s.Id FROM Module m JOIN Subscription s ON (m.Id = s.Parent) WHERE m.Name=@Name",
                                    db);
                 cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 var reader = cmd.ExecuteReader();
+                
+                List<int> subsIds = new List<int>();
+                while (reader.Read())
+                {
+                    subsIds.Add(reader.GetInt32(0));
+                }
+                reader.Close();
 
-                if (reader.Read()) {
-                    throw new Exception("Cannot delete a module with data or subscriptions");
+                cmd =
+                    new
+                        SqlCommand("SELECT d.Id FROM Module m JOIN Data d ON (m.Id = d.Parent) WHERE m.Name=@Name",
+                                   db);
+                cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
+                reader = cmd.ExecuteReader();
+                
+                List<int> dataIds = new List<int>();
+                while (reader.Read())
+                {
+                    dataIds.Add(reader.GetInt32(0));
                 }
 
                 reader.Close();
+
+                //Delete all subscriptions
+                foreach (int id in subsIds)
+                {
+                    cmd = new SqlCommand("DELETE FROM Subscription WHERE Id=@Id", db);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    int _rowChng = cmd.ExecuteNonQuery();
+
+                    if (_rowChng != 1)
+                        throw new UntreatedSqlException();
+                }
+
+                //Delete all data
+                foreach (int id in dataIds)
+                {
+                    cmd = new SqlCommand("DELETE FROM Data WHERE Id=@Id", db);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    int _rowChng = cmd.ExecuteNonQuery();
+
+                    if (_rowChng != 1)
+                        throw new UntreatedSqlException();
+                }
 
                 cmd = new SqlCommand("DELETE FROM Module WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
