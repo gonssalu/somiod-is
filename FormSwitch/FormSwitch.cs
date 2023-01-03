@@ -7,7 +7,7 @@ using static FormSwitch.Properties.Settings;
 
 namespace FormSwitch
 {
-    public partial class Form1 : Form
+    public partial class FormSwitch : Form
     {
         #region Constants
 
@@ -19,7 +19,7 @@ namespace FormSwitch
 
         private readonly RestClient _restClient = new RestClient(ApiBaseUri);
 
-        public Form1()
+        public FormSwitch()
         {
             InitializeComponent();
         }
