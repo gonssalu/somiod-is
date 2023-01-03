@@ -69,18 +69,6 @@ namespace FormSwitch
                 MessageBox.Show("An error occurred while creating the module", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        #endregion
-
-        private void btnOn_Click(object sender, EventArgs e)
-        {
-            CreateData(ApplicationName, ModuleToSendData, "ON");
-        }
-
-        private void btnOff_Click(object sender, EventArgs e)
-        {
-            CreateData(ApplicationName, ModuleToSendData, "OFF");
-        }
-
         private void CreateData(string appName, string moduleToSendData, string content)
         {
             var mod = new Data(content);
@@ -98,6 +86,19 @@ namespace FormSwitch
             if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+        #endregion
+
+        private void btnOn_Click(object sender, EventArgs e)
+        {
+            CreateData(ApplicationName, ModuleToSendData, "ON");
+        }
+
+        private void btnOff_Click(object sender, EventArgs e)
+        {
+            CreateData(ApplicationName, ModuleToSendData, "OFF");
+        }
+
         private void FormSwitch_Shown(object sender, EventArgs e)
         {
             CreateModule(ModuleName, ApplicationName);
