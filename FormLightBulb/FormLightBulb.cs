@@ -1,11 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 using FormLightBulb.Models;
 using FormLightBulb.Properties;
 using RestSharp;
+using SOMIOD.Models;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using static FormLightBulb.Properties.Settings;
@@ -70,9 +75,15 @@ namespace FormLightBulb
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs args)
         {
             string message = Encoding.UTF8.GetString(args.Message);
-            _turnLightBulbOn = message.ToUpper() == "ON";
-            UpdateLightBulbState();
-            MessageBox.Show(message);
+            using (TextReader reader = new StringReader(message))
+            {
+                var not = (Notification)new XmlSerializer(typeof(Notification)).Deserialize(reader);
+                if (not.EventType != "CREATE") return;
+
+                _turnLightBulbOn = not.Content == "ON";
+                UpdateLightBulbState();
+            }
+
         }
 
         #endregion
