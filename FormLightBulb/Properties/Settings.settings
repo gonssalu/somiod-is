@@ -1,7 +1,33 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FormLightBulb.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Endpoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">mqtt://127.0.0.1:1883</Value>
+    </Setting>
+    <Setting Name="Topic" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">light_bulb</Value>
+    </Setting>
+    <Setting Name="BrokerIp" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+    <Setting Name="ApiBaseUri" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:44396/</Value>
+    </Setting>
+    <Setting Name="CustomApiError" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">422</Value>
+    </Setting>
+    <Setting Name="ApplicationName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">lighting</Value>
+    </Setting>
+    <Setting Name="ModuleName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">light_bulb</Value>
+    </Setting>
+    <Setting Name="SubscriptionName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">sub1</Value>
+    </Setting>
+    <Setting Name="EventType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">CREATE</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

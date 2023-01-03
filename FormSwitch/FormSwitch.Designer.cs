@@ -1,6 +1,6 @@
 ﻿namespace FormSwitch
 {
-    partial class Form1
+    partial class FormSwitch
     {
         /// <summary>
         /// Required designer variable.
@@ -51,7 +51,7 @@
             this.btnOff.UseVisualStyleBackColor = true;
             this.btnOff.Click += new System.EventHandler(this.btnOff_Click);
             // 
-            // Form1
+            // FormSwitch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -61,10 +61,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
-            this.Name = "Form1";
+            this.Name = "FormSwitch";
             this.Text = "Switch";
             this.ResumeLayout(false);
-
         }
 
         #endregion
