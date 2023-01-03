@@ -59,15 +59,12 @@ namespace FormSwitch.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("light_bulb")]
         public string ModuleToSendData {
             get {
                 return ((string)(this["ModuleToSendData"]));
-            }
-            set {
-                this["ModuleToSendData"] = value;
             }
         }
     }
