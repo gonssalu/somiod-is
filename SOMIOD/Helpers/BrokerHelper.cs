@@ -17,7 +17,7 @@ namespace SOMIOD.Helpers
             return Uri.CheckHostName(name) != UriHostNameType.Unknown;
         }
 
-        public static async void FireNotification(string endPoint, string topic, Notification notification)
+        public static void FireNotification(string endPoint, string topic, Notification notification)
         {
             try
             {
