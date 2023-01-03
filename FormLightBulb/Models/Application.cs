@@ -23,13 +23,6 @@ namespace FormLightBulb.Models
         [XmlElement("CreationDate")]
         public DateTime CreationDate { get; set; }
 
-        // public Application(int id, string name, DateTime creationDate)
-        // {
-        //     Id = id;
-        //     Name = name;
-        //     CreationDate = creationDate;
-        // }
-
         public Application(string name)
         {
             Name = name;
