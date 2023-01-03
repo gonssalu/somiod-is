@@ -11,7 +11,7 @@ namespace SOMIOD.Controllers
 {
     public class SomiodController : ApiController
     {
-        private readonly List<string> _VALID_EVENT_TYPES = new List<string>() { "CREATE", "DELETE", "BOTH" };
+        private readonly List<string> _validEventTypes = new List<string>() { "CREATE", "DELETE", "BOTH" };
 
         #region Application
 
@@ -185,7 +185,7 @@ namespace SOMIOD.Controllers
                 // if (!BrokerHelper.IsValidEndpoint(newSubscription.Endpoint))
                 //     throw new UnprocessableEntityException("You must include a valid endpoint for that subscription");
 
-                if (!_VALID_EVENT_TYPES.Contains(newSubscription.EventType.ToUpper()))
+                if (!_validEventTypes.Contains(newSubscription.EventType.ToUpper()))
                     throw new UnprocessableEntityException("You must include a valid event for that subscription. Valid event types are: CREATE, DELETE, BOTH");
 
                 DbHelper.CreateSubscription(application, module, newSubscription);
@@ -226,8 +226,9 @@ namespace SOMIOD.Controllers
                 return RequestHelper.CreateMessage(Request, "Data resource created");
             }
             catch (Exception e) {
-                if(e is BrokerException)
-                    return RequestHelper.CreateMessage(Request, "Data resource was created, but could not notify at least one o the subscribers. Error: " + e.Message);
+                if (e is BrokerException)
+                    return RequestHelper.CreateMessage(Request,
+                                                       "Data resource was created, but could not notify at least one o the subscribers. Error: " + e.Message);
                 return RequestHelper.CreateError(Request, e);
             }
         }
@@ -239,10 +240,10 @@ namespace SOMIOD.Controllers
                 DbHelper.DeleteData(application, module, dataId);
                 return Request.CreateResponse(HttpStatusCode.OK, "Data resource was deleted");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 if (e is BrokerException)
-                    return RequestHelper.CreateMessage(Request, "Data resource was deleted, but could not notify at least one o the subscribers. Error: " + e.Message);
+                    return RequestHelper.CreateMessage(Request,
+                                                       "Data resource was deleted, but could not notify at least one o the subscribers. Error: " + e.Message);
                 return RequestHelper.CreateError(Request, e);
             }
         }

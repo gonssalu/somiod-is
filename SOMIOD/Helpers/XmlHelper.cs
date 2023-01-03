@@ -1,14 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
+﻿using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using SOMIOD.Exceptions;
 
 namespace SOMIOD.Helpers
 {
-    public class XmlHelper
+    public static class XmlHelper
     {
         public static XmlDocument Serialize(object obj)
         {

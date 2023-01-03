@@ -8,7 +8,7 @@ namespace SOMIOD.Models
     public class ModuleWithData : Module
     {
         [XmlArray("DataResources")]
-        [XmlArrayItem(Type=typeof(Data), ElementName = "Data")]
+        [XmlArrayItem(Type = typeof(Data), ElementName = "Data")]
         public List<Data> Data { get; set; }
 
         public ModuleWithData() { }
