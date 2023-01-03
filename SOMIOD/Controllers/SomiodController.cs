@@ -212,7 +212,7 @@ namespace SOMIOD.Controllers
 
         #region Data
 
-        [Route("api/somiod/{application}/{module}")]
+        [Route("api/somiod/{application}/{module}/data")]
         public HttpResponseMessage PostData(string application, string module, [FromBody] Data newData)
         {
             try {
@@ -230,7 +230,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{application}/{module}/{dataId}")]
+        [Route("api/somiod/{application}/{module}/data/{dataId}")]
         public HttpResponseMessage DeleteData(string application, string module, int dataId)
         {
             try {

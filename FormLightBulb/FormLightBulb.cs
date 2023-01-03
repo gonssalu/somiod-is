@@ -152,7 +152,7 @@ namespace FormLightBulb
             }
 
             if (response.StatusCode != HttpStatusCode.OK) {
-                MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred while creating the module", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
