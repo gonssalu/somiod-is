@@ -52,6 +52,8 @@ namespace FormSwitch
                 MessageBox.Show("An error occurred while creating data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            MessageBox.Show(response.Content);
         }
     }
 }

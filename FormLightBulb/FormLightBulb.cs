@@ -72,6 +72,7 @@ namespace FormLightBulb
             string message = Encoding.UTF8.GetString(args.Message);
             _turnLightBulbOn = message.ToUpper() == "ON";
             UpdateLightBulbState();
+            MessageBox.Show(message);
         }
 
         #endregion
@@ -98,7 +99,7 @@ namespace FormLightBulb
             _mClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
 
             // Subscribe to topic
-            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE };
             _mClient.Subscribe(Topic, qosLevels);
 
             // MessageBox.Show("Subscribed to topics", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

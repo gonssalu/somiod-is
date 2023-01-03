@@ -1,8 +1,11 @@
 ﻿using SOMIOD.Models;
 using System;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace SOMIOD.Helpers
 {
@@ -14,7 +17,7 @@ namespace SOMIOD.Helpers
             return Uri.CheckHostName(name) != UriHostNameType.Unknown;
         }
 
-        public static void FireNotification(string endPoint, string topic, Notification notification)
+        public static async void FireNotification(string endPoint, string topic, Notification notification)
         {
             try
             {
@@ -24,10 +27,14 @@ namespace SOMIOD.Helpers
                 if (!_mClient.IsConnected)
                     throw new BrokerException("Couldn't connect to message broker endpoint '" + endPoint + "'");
 
+                System.Diagnostics.Debug.WriteLine("\n\nConnected to message broker endpoint '" + endPoint + "'\n\n");
+
                 _mClient.Publish(topic, Encoding.UTF8.GetBytes(XmlHelper.Serialize(notification).OuterXml));
+                //_mClient.Publish(topic, Encoding.UTF8.GetBytes("ON"));
 
                 if (_mClient.IsConnected)
                 {
+                    Thread.Sleep(1000);
                     _mClient.Disconnect();
                 }
             }
