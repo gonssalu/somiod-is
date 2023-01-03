@@ -4,9 +4,11 @@ using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
 using FormLightBulb.Models;
+using FormLightBulb.Properties;
 using RestSharp;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using static FormLightBulb.Properties.Settings;
 using Application = FormLightBulb.Models.Application;
 
 namespace FormLightBulb
@@ -15,17 +17,15 @@ namespace FormLightBulb
     {
         #region Constants
 
-        private static readonly string BrokerIp = "127.0.0.1";
-        private static readonly string ApiBaseUri = @"http://localhost:44396/";
-
-        private static readonly HttpStatusCode CustomApiError = (HttpStatusCode) 422;
-
-        private static readonly string ApplicationName = "lighting";
-        private static readonly string ModuleName = "light_bulb";
-        private static readonly string SubscriptionName = "sub1";
-        private static readonly string EventType = "CREATE";
-        private static readonly string Endpoint = "mqtt://127.0.0.1:1883";
-        private static readonly string[] Topic = { "light_bulb" };
+        private static readonly string BrokerIp = Default.BrokerIp;
+        private static readonly string ApiBaseUri = Default.ApiBaseUri;
+        private static readonly HttpStatusCode CustomApiError = (HttpStatusCode) Default.CustomApiError;
+        private static readonly string ApplicationName = Default.ApplicationName;
+        private static readonly string ModuleName = Default.ModuleName;
+        private static readonly string SubscriptionName = Default.SubscriptionName;
+        private static readonly string EventType = Default.EventType;
+        private static readonly string Endpoint = Default.Endpoint;
+        private static readonly string[] Topic = { Default.Topic };
 
         #endregion
 
@@ -59,12 +59,12 @@ namespace FormLightBulb
         {
             if (_turnLightBulbOn) {
                 _turnLightBulbOn = true;
-                pbLightbulb.Image = Properties.Resources.light_bulb_on;
+                pbLightbulb.Image = Resources.light_bulb_on;
                 return;
             }
 
             _turnLightBulbOn = false;
-            pbLightbulb.Image = Properties.Resources.light_bulb_off;
+            pbLightbulb.Image = Resources.light_bulb_off;
         }
 
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs args)
