@@ -1,14 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Xml;
-using System.Xml.Serialization;
 using SOMIOD.Exceptions;
 
 namespace SOMIOD.Helpers
 {
-    public class RequestHelper
+    public static class RequestHelper
     {
         public static HttpResponseMessage CreateError(HttpRequestMessage request, Exception exception)
         {

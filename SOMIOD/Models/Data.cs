@@ -8,10 +8,10 @@ namespace SOMIOD.Models
     {
         [XmlElement(ElementName = "Id")]
         public int Id { get; set; }
-        
+
         [XmlElement(ElementName = "Content")]
         public string Content { get; set; }
-        
+
         [XmlElement(ElementName = "CreationDate")]
         public string CreationDate { get; set; }
 

@@ -11,9 +11,9 @@ namespace SOMIOD.Helpers
     {
         #region Generic Methods
 
-        //Verifica se existe uma child com o nome fornecido no parent com o nome fornecido, e se o parent existe em si
-        //Este método deve ser utilizado em Deletes / Updates, ou seja em situações em que a child já existe.
-        //Retorna o id da child
+        // Verifica se existe uma child com o nome fornecido no parent com o nome fornecido, e se o parent existe em si
+        // Este método deve ser utilizado em Deletes / Updates, ou seja em situações em que a child já existe.
+        // Retorna o id da child
         private static int IsParentValid(SqlConnection db, string parentType, string parentName, string childType, string childName)
         {
             var cmd =
@@ -35,9 +35,9 @@ namespace SOMIOD.Helpers
             return childId;
         }
 
-        //Procura o parent, e se existir retorna o seu id.
-        //Faz logo a verificação da existência do parent
-        //Este método deve ser utilizado em Creates onde a child ainda não existe e necessita do id do parent.
+        // Procura o parent, e se existir retorna o seu id.
+        // Faz logo a verificação da existência do parent
+        // Este método deve ser utilizado em Creates onde a child ainda não existe e necessita do id do parent.
         private static int GetParentId(SqlConnection db, string parentType, string parentName)
         {
             var cmd = new SqlCommand("SELECT Id FROM " + parentType + " WHERE Name=@ParentName", db);
@@ -65,9 +65,8 @@ namespace SOMIOD.Helpers
                 var cmd = new SqlCommand("SELECT * FROM Application", db);
                 var reader = cmd.ExecuteReader();
 
-                while (reader.Read()) {
+                while (reader.Read())
                     applications.Add(new Application(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2)));
-                }
 
                 reader.Close();
             }
@@ -83,18 +82,17 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 var reader = cmd.ExecuteReader();
 
-                if (reader.Read()) {
+                if (reader.Read())
                     return new Application(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2));
-                } else {
+                else
                     throw new ModelNotFoundException("Application");
-                }
             }
         }
 
         private static void ProcessSqlExceptionApplication(SqlException e)
         {
             switch (e.Number) {
-                //Cannot insert duplicate key in object
+                // Cannot insert duplicate key in object
                 case 2627:
                     throw new UnprocessableEntityException("An application with that name already exists");
                 default:
@@ -128,8 +126,8 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
-                //Check if app with that name exists
-                //CheckAppNameIsFree(db, newName);
+                // Check if app with that name exists
+                // CheckAppNameIsFree(db, newName);
 
                 var cmd = new SqlCommand("UPDATE Application SET Name=@NewName WHERE Name=@Name", db);
                 cmd.Parameters.AddWithValue("@Name", name.ToLower());
@@ -156,9 +154,8 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@Name", name.ToLower());
                 var reader = cmd.ExecuteReader();
 
-                if (reader.Read()) {
+                if (reader.Read())
                     throw new Exception("Cannot delete an application with modules");
-                }
 
                 reader.Close();
 
@@ -183,7 +180,7 @@ namespace SOMIOD.Helpers
         private static void ProcessSqlExceptionModule(SqlException e)
         {
             switch (e.Number) {
-                //Cannot insert duplicate key in object
+                // Cannot insert duplicate key in object
                 case 2627:
                     throw new UnprocessableEntityException("A module with that name already exists in that application");
                 default:
@@ -201,9 +198,8 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@AppName", appName.ToLower());
                 var reader = cmd.ExecuteReader();
 
-                while (reader.Read()) {
+                while (reader.Read())
                     modules.Add(new Module(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3)));
-                }
 
                 reader.Close();
             }
@@ -222,7 +218,7 @@ namespace SOMIOD.Helpers
                 cmd.Parameters.AddWithValue("@Id", moduleId);
                 var reader = cmd.ExecuteReader();
 
-                List<Data> data = GetDataResourcesForModule(moduleId);
+                var data = GetDataResourcesForModule(moduleId);
 
                 if (reader.Read()) {
                     return new ModuleWithData(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3), data);
@@ -286,19 +282,17 @@ namespace SOMIOD.Helpers
 
                 IsModuleParentValid(db, appName, moduleName);
 
-                //Check if module has any data / subscription children
+                // Check if module has any data / subscription children
                 var cmd =
                     new
                         SqlCommand("SELECT s.Id FROM Module m JOIN Subscription s ON (m.Id = s.Parent) WHERE m.Name=@Name",
                                    db);
                 cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 var reader = cmd.ExecuteReader();
-                
-                List<int> subsIds = new List<int>();
+
+                var subsIds = new List<int>();
                 while (reader.Read())
-                {
                     subsIds.Add(reader.GetInt32(0));
-                }
                 reader.Close();
 
                 cmd =
@@ -307,18 +301,15 @@ namespace SOMIOD.Helpers
                                    db);
                 cmd.Parameters.AddWithValue("@Name", moduleName.ToLower());
                 reader = cmd.ExecuteReader();
-                
-                List<int> dataIds = new List<int>();
+
+                var dataIds = new List<int>();
                 while (reader.Read())
-                {
                     dataIds.Add(reader.GetInt32(0));
-                }
 
                 reader.Close();
 
-                //Delete all subscriptions
-                foreach (int id in subsIds)
-                {
+                // Delete all subscriptions
+                foreach (int id in subsIds) {
                     cmd = new SqlCommand("DELETE FROM Subscription WHERE Id=@Id", db);
                     cmd.Parameters.AddWithValue("@Id", id);
                     int _rowChng = cmd.ExecuteNonQuery();
@@ -327,9 +318,8 @@ namespace SOMIOD.Helpers
                         throw new UntreatedSqlException();
                 }
 
-                //Delete all data
-                foreach (int id in dataIds)
-                {
+                // Delete all data
+                foreach (int id in dataIds) {
                     cmd = new SqlCommand("DELETE FROM Data WHERE Id=@Id", db);
                     cmd.Parameters.AddWithValue("@Id", id);
                     int _rowChng = cmd.ExecuteNonQuery();
@@ -353,9 +343,8 @@ namespace SOMIOD.Helpers
 
         private static void ProcessSqlExceptionSubscription(SqlException e)
         {
-            switch (e.Number)
-            {
-                //Cannot insert duplicate key in object
+            switch (e.Number) {
+                // Cannot insert duplicate key in object
                 case 2627:
                     throw new UnprocessableEntityException("A subscription with that name already exists in that module");
                 default:
@@ -414,7 +403,7 @@ namespace SOMIOD.Helpers
 
         #region Data
 
-        public static List<Data> GetDataResourcesForModule(int parentId)
+        private static List<Data> GetDataResourcesForModule(int parentId)
         {
             var dataRes = new List<Data>();
 
@@ -437,8 +426,7 @@ namespace SOMIOD.Helpers
 
         private static void NotifySubscriptions(SqlConnection db, int parentId, string moduleName, string eventType, string data)
         {
-            try
-            {
+            try {
                 var notification = new Notification(eventType, data);
 
                 var cmd = new SqlCommand("SELECT * FROM Subscription WHERE Parent=@Parent AND Event=@Event OR Event='BOTH'", db);
@@ -451,9 +439,8 @@ namespace SOMIOD.Helpers
 
                 reader.Close();
             }
-            catch(SqlException e)
-            {
-                throw new BrokerException("An unknown database error (#"+e.Number+") has happened while trying to notify subscriptions");
+            catch (SqlException e) {
+                throw new BrokerException("An unknown database error (#" + e.Number + ") has happened while trying to notify subscriptions");
             }
         }
 
@@ -461,7 +448,7 @@ namespace SOMIOD.Helpers
         {
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
-                
+
                 int parentId = IsModuleParentValid(db, appName, moduleName);
 
                 var cmd = new SqlCommand("INSERT INTO Data (Content, CreationDate, Parent) VALUES (@Content, @CreationDate, @Parent)", db);
@@ -477,7 +464,7 @@ namespace SOMIOD.Helpers
 
                     NotifySubscriptions(db, parentId, moduleName, "CREATE", dataContent);
                 }
-                catch (SqlException e) {
+                catch (SqlException) {
                     throw new UntreatedSqlException();
                 }
             }
@@ -487,7 +474,7 @@ namespace SOMIOD.Helpers
             using (var dbConn = new DbConnection()) {
                 var db = dbConn.Open();
 
-                var parentId = IsModuleParentValid(db, appName, moduleName);
+                int parentId = IsModuleParentValid(db, appName, moduleName);
 
                 var cmd =
                     new
@@ -501,7 +488,7 @@ namespace SOMIOD.Helpers
                 if (!reader.Read())
                     throw new
                         ModelNotFoundException("A data resource with the Id #" + dataId + " does not exist in the module " + moduleName, false);
-                var dataContent = reader.GetString(2);
+                string dataContent = reader.GetString(2);
                 reader.Close();
 
                 cmd = new SqlCommand("DELETE FROM Data WHERE Id=@Id", db);
