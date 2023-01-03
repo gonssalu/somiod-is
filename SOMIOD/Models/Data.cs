@@ -13,8 +13,9 @@ namespace SOMIOD.Models
         public string Content { get; set; }
         
         [XmlElement(ElementName = "CreationDate")]
-        public DateTime CreationDate { get; set; }
-        
+        public string CreationDate { get; set; }
+
+
         [XmlElement(ElementName = "Parent")]
         public int Parent { get; set; }
 
@@ -25,7 +26,7 @@ namespace SOMIOD.Models
             {
                 Id = id;
                 Content = content;
-                CreationDate = creationDate;
+                CreationDate = creationDate.ToString("yyyy-MM-dd HH:mm:ss");
                 Parent = parent;
             }
         }
