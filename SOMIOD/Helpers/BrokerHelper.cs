@@ -19,8 +19,7 @@ namespace SOMIOD.Helpers
 
         public static async void FireNotification(string endPoint, string topic, Notification notification)
         {
-            try
-            {
+            try {
                 var _mClient = new MqttClient(endPoint);
                 _mClient.Connect(_GUID);
 
@@ -32,21 +31,19 @@ namespace SOMIOD.Helpers
                 _mClient.Publish(topic, Encoding.UTF8.GetBytes(XmlHelper.Serialize(notification).OuterXml));
                 //_mClient.Publish(topic, Encoding.UTF8.GetBytes("ON"));
 
-                if (_mClient.IsConnected)
-                {
+                if (_mClient.IsConnected) {
                     Thread.Sleep(1000);
                     _mClient.Disconnect();
                 }
             }
-            catch(Exception e)
-            {
+            catch (Exception e) {
                 if (e is BrokerException) throw e;
-                else if(e is MqttConnectionException)
+                else if (e is MqttConnectionException)
                     throw new BrokerException("Couldn't connect to message broker endpoint '" + endPoint + "'");
                 else
                     throw new BrokerException(e.Message);
             }
-            
+
         }
     }
 }

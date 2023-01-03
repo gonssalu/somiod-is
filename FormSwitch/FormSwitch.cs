@@ -48,14 +48,8 @@ namespace FormSwitch
                 return;
             }
 
-            MessageBox.Show(response.Content, "Response", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            if (response.StatusCode != HttpStatusCode.OK) {
+            if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            MessageBox.Show(response.Content);
         }
     }
 }

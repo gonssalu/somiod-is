@@ -75,9 +75,8 @@ namespace FormLightBulb
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs args)
         {
             string message = Encoding.UTF8.GetString(args.Message);
-            using (TextReader reader = new StringReader(message))
-            {
-                var not = (Notification)new XmlSerializer(typeof(Notification)).Deserialize(reader);
+            using (TextReader reader = new StringReader(message)) {
+                var not = (Notification) new XmlSerializer(typeof(Notification)).Deserialize(reader);
                 if (not.EventType != "CREATE") return;
 
                 _turnLightBulbOn = not.Content == "ON";
@@ -93,27 +92,19 @@ namespace FormLightBulb
         private void ConnectToBroker()
         {
             _mClient = new MqttClient(BrokerIp);
-            // _mClient.Connect("FormSwitch");
             _mClient.Connect(Guid.NewGuid().ToString());
 
             if (!_mClient.IsConnected) {
                 MessageBox.Show("Could not connect to the message broker", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             }
-
-            // MessageBox.Show("Connected to the message broker", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void SubscribeToTopics()
         {
-            // Msg arrived
             _mClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
-
-            // Subscribe to topic
             byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE };
             _mClient.Subscribe(Topic, qosLevels);
-
-            // MessageBox.Show("Subscribed to topics", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -137,13 +128,8 @@ namespace FormLightBulb
                 return;
             }
 
-            if (response.StatusCode != HttpStatusCode.OK) {
+            if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // TODO: Remove this
-            MessageBox.Show("Application created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void CreateModule(string moduleName, string applicationName)
@@ -163,13 +149,8 @@ namespace FormLightBulb
                 return;
             }
 
-            if (response.StatusCode != HttpStatusCode.OK) {
+            if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating the module", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // TODO: Remove this
-            MessageBox.Show("Module created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void CreateSubscription(string subscriptionName, string moduleName, string applicationName, string eventType, string endpoint)
@@ -189,13 +170,8 @@ namespace FormLightBulb
                 return;
             }
 
-            if (response.StatusCode != HttpStatusCode.OK) {
+            if (response.StatusCode != HttpStatusCode.OK)
                 MessageBox.Show("An error occurred while creating the application", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // TODO: Remove this
-            MessageBox.Show("Subscription created", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
